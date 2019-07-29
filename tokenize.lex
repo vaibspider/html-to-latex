@@ -1,25 +1,35 @@
+
 %{
+#include "parse.tab.h"
+#include <string.h>
 #include <stdio.h>
 %}
 
 %%
 
-"<html>"		printf("HTML OPEN: %s \n", yytext);
-"</html>"		printf("HTML CLOSE: %s \n", yytext);
-"<head>"		printf("HEAD OPEN: %s \n", yytext);
-"</head>"		printf("HEAD CLOSE: %s \n", yytext);
-"<body>"		printf("BODY OPEN: %s \n", yytext);
-"</body>"		printf("BODY CLOSE: %s \n", yytext);
-"<title>"		printf("TITLE OPEN: %s \n", yytext);
-"</title>"		printf("TITLE CLOSE: %s \n", yytext);
-"<p>"			printf("PARAGRAPH OPEN: %s \n", yytext);
-"</p>"			printf("PARAGRAPH CLOSE: %s \n", yytext);
-[a-zA-Z0-9 .]+		printf("TEXT : %s \n", yytext);
+"<html>"		return OHTML;
+"</html>"		return CHTML;
+"<head>"		return OHEAD;
+"</head>"		return CHEAD;
+"<body>"		return OBODY;
+"</body>"		return CBODY;
+"<title>"		return OTITLE;
+"</title>"		return CTITLE;
+"<p>"			return OPARA;
+"</p>"			return CPARA;
+[a-zA-Z0-9 .]+		{
+			    yylval.str = strdup(yytext);
+			    return CONTENT;
+			}
 [ \t\n]+		;
 
 %%
 
-int main() {
+void yyerror(char *s) {
+    fprintf(stderr, "%s\n", s);
+}
+
+/*int main() {
 	yylex();
 	return 0;
-}
+}*/
