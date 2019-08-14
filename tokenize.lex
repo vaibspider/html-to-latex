@@ -5,8 +5,18 @@
 #include <stdio.h>
 %}
 
+%start doctypeseen
+
 %%
 
+"<!DOCTYPE HTML"	{
+			    BEGIN doctypeseen;
+			    return ODOCTYPE;
+			}
+<doctypeseen>">"	{
+			    BEGIN INITIAL;
+			    return CDOCTYPE;
+			}
 "<html>"		return OHTML;
 "</html>"		return CHTML;
 "<head>"		return OHEAD;

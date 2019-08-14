@@ -11,6 +11,7 @@ void yyerror(char *s);
 %token OBODY CBODY
 %token OPARA CPARA
 %token CONTENT
+%token ODOCTYPE CDOCTYPE
 
 %union {
     long int4;
@@ -25,12 +26,37 @@ void yyerror(char *s);
 %type <str> title
 %type <str> content
 %type <str> para
+%type <str> doctype
+%type <str> optional_content
 
 %%
 
-program:
-       OHTML head_body CHTML		{ 
-					    printf("<html>%s</html>\n", $2);
+html_page:
+       doctype OHTML head_body CHTML	{ 
+					    printf("<html>%s%s</html>\n", $1, $3);
+					}
+
+doctype:
+       ODOCTYPE optional_content CDOCTYPE {
+						if (strcmp($2, "") == 0) {
+						    $$ = "<!DOCTYPE HTML>";
+						}
+						else {
+						    char *doctype = (char *) malloc((strlen($2) + 16) * sizeof(char));
+						    strcpy(doctype, "<!DOCTYPE HTML");
+						    strcat(doctype, $2);
+						    strcat(doctype, ">");
+						    $$ = doctype;
+						}
+					}
+optional_content:
+		%empty 			{
+					    $$ = "";
+					}
+		| CONTENT		{
+					    char *optional_content = (char *) malloc((strlen($1)+1) * sizeof(char));
+					    strcpy(optional_content, $1);
+					    $$ = optional_content;
 					}
 
 head_body:
