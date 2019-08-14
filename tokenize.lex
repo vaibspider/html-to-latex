@@ -1,8 +1,8 @@
 
 %{
-#include "parse.tab.h"
-#include <string.h>
-#include <stdio.h>
+  #include "parse.tab.h"
+  #include <string.h>
+  #include <stdio.h>
 %}
 
 %start doctypeseen
@@ -10,13 +10,15 @@
 %%
 
 "<!DOCTYPE HTML"	{
-			    BEGIN doctypeseen;
-			    return ODOCTYPE;
-			}
+    BEGIN doctypeseen;
+    return ODOCTYPE;
+}
+
 <doctypeseen>">"	{
-			    BEGIN INITIAL;
-			    return CDOCTYPE;
-			}
+  BEGIN INITIAL;
+  return CDOCTYPE;
+}
+
 "<html>"		return OHTML;
 "</html>"		return CHTML;
 "<head>"		return OHEAD;
@@ -24,19 +26,21 @@
 "<body>"		return OBODY;
 "</body>"		return CBODY;
 "<title>"		return OTITLE;
-"</title>"		return CTITLE;
-"<p>"			return OPARA;
+"</title>"	return CTITLE;
+"<p>"			  return OPARA;
 "</p>"			return CPARA;
-[a-zA-Z0-9 .]+		{
-			    yylval.str = strdup(yytext);
-			    return CONTENT;
-			}
+
+[a-zA-Z0-9 .]+	{
+  yylval.str = strdup(yytext);
+  return CONTENT;
+}
+
 [ \t\n]+		;
 
 %%
 
 void yyerror(char *s) {
-    fprintf(stderr, "%s\n", s);
+  fprintf(stderr, "%s\n", s);
 }
 
 /*int main() {
