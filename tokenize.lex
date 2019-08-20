@@ -5,10 +5,15 @@
   #include <stdio.h>
 %}
 
-%start doctypeseen
-%start anchor
 %start beforehyperlink
 %start hyperlink 
+%start img
+%start imghyperlink
+%start imgsrc
+%start imgheight
+%start imgwidth
+%start widthdigit
+%start heightdigit
 
 a [aA]
 b [bB]
@@ -54,15 +59,8 @@ hyperlink [a-zA-Z0-9/:.]+
 %%
 
 "<!"{d}{o}{c}{t}{y}{p}{e}{whitespaces}{h}{t}{m}{l} {
-    BEGIN doctypeseen;
     yylval.str = strdup(yytext);
     return ODOCTYPE;
-}
-
-<doctypeseen>">"	{
-  BEGIN INITIAL;
-  yylval.str = strdup(yytext);
-  return CDOCTYPE;
 }
 
 "<"{h}{t}{m}{l}{whitespaces}">"		    return OHTML;
@@ -93,12 +91,11 @@ hyperlink [a-zA-Z0-9/:.]+
 }
 
 <hyperlink>\"{whitespaces}">" {
-  BEGIN anchor;
+  BEGIN INITIAL;
   return OANCHOR;
 }
 
-<anchor>{whitespaces}"</"{a}{whitespaces}">" {
-  BEGIN INITIAL;
+"</"{a}{whitespaces}">" {
   return CANCHOR;
 }
 
@@ -180,10 +177,78 @@ hyperlink [a-zA-Z0-9/:.]+
 
 "</"{s}{u}{p}{whitespaces}">"      return CSUP;
 
+"<"{i}{m}{g}  {
+  BEGIN img;
+  return OIMG;
+}
+
+<img>{s}{r}{c}{whitespaces}={whitespaces}\"  {
+  BEGIN imgsrc;
+  return OIMGSRC;
+}
+
+<imgsrc>{hyperlink} {
+  BEGIN imghyperlink;
+  return HYPERLINK;
+}
+
+<imghyperlink>\" {
+  BEGIN img;
+  return CIMGSRC;
+}
+
+<img>{w}{i}{d}{t}{h}{whitespaces}={whitespaces}\" {
+  BEGIN imgwidth;
+  return OIMGWIDTH;
+}
+
+<imgwidth>{digits} {
+  BEGIN widthdigit;
+  return WIDTH;
+}
+
+<widthdigit>\" {
+  BEGIN img;
+  return CIMGWIDTH;
+}
+
+<img>{h}{e}{i}{g}{h}{t}{whitespaces}={whitespaces}\" {
+  BEGIN imgheight;
+  return OIMGHEIGHT;
+}
+
+<imgheight>{digits} {
+  BEGIN heightdigit;
+  return HEIGHT;
+}
+
+<heightdigit>\" {
+  BEGIN img;
+  return CIMGHEIGHT;
+}
+
+<img>">" {
+  BEGIN INITIAL;
+  return CIMG;
+}
+
+"<"{f}{i}{g}{u}{r}{e}{whitespaces}">"   return OFIGURE;
+
+"</"{f}{i}{g}{u}{r}{e}{whitespaces}">"   return CFIGURE;
+
+"<"{f}{i}{g}{c}{a}{p}{t}{i}{o}{n}{whitespaces}">"   return OFIGCAPTION;
+
+"</"{f}{i}{g}{c}{a}{p}{t}{i}{o}{n}{whitespaces}">"   return CFIGCAPTION;
+
 [a-zA-Z0-9 .]+	{
   yylval.str = strdup(yytext);
   return CONTENT;
 }
+
+">"	{
+  return CANGBRKT;
+}
+
 [ \t\n]+		;
 
 %%
