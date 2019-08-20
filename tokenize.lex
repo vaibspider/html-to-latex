@@ -102,23 +102,88 @@ hyperlink [a-zA-Z0-9/:.]+
   return CANCHOR;
 }
 
-"<"{p}{whitespaces}">"			          return OPARA;
+"<"{b}{r}{whitespaces}">"    return LINEBR;
 
-"</"{p}{whitespaces}">"			          return CPARA;
+"<"{p}{whitespaces}">"			 return OPARA;
+
+"</"{p}{whitespaces}">"			 return CPARA;
+
+"<"{h}1{whitespaces}">"       return OHEADONE;
+
+"</"{h}1{whitespaces}">"       return CHEADONE;
+
+"<"{h}2{whitespaces}">"       return OHEADTWO;
+
+"</"{h}2{whitespaces}">"       return CHEADTWO;
+
+"<"{h}3{whitespaces}">"       return OHEADTHREE;
+
+"</"{h}3{whitespaces}">"       return CHEADTHREE;
+
+"<"{h}4{whitespaces}">"       return OHEADFOUR;
+
+"</"{h}4{whitespaces}">"       return CHEADFOUR;
+
+"<"{o}{l}{whitespaces}">"     return OORDERLIST;
+
+"</"{o}{l}{whitespaces}">"     return CORDERLIST;
+
+"<"{u}{l}{whitespaces}">"     return OUNORDERLIST;
+
+"</"{u}{l}{whitespaces}">"     return CUNORDERLIST;
+
+"<"{l}{i}{whitespaces}">"     return OLISTITEM;
+
+"</"{l}{i}{whitespaces}">"     return CLISTITEM;
+
+"<"{d}{t}{whitespaces}">"     return ODESCTERM;
+
+"</"{d}{t}{whitespaces}">"     return CDESCTERM;
+
+"<"{d}{d}{whitespaces}">"     return ODESCDESC;
+
+"</"{d}{d}{whitespaces}">"     return CDESCDESC;
+
+"<"{d}{i}{v}{whitespaces}">"    return ODIV;
+
+"</"{d}{i}{v}{whitespaces}">"    return CDIV;
+
+"<"{u}{whitespaces}">"      return OUNDERLINE;
+
+"</"{u}{whitespaces}">"      return CUNDERLINE;
+
+"<"{b}{whitespaces}">"      return OBOLD;
+
+"</"{b}{whitespaces}">"      return CBOLD;
+
+"<"{i}{whitespaces}">"      return OITALICIZE;
+
+"</"{i}{whitespaces}">"      return CITALICIZE;
+
+"<"{e}{m}{whitespaces}">"      return OEMPHASIZE;
+
+"</"{e}{m}{whitespaces}">"      return CEMPHASIZE;
+
+"<"{s}{t}{r}{o}{n}{g}{whitespaces}">"      return OSTRONG;
+
+"</"{s}{t}{r}{o}{n}{g}{whitespaces}">"      return CSTRONG;
+
+"<"{s}{m}{a}{l}{l}{whitespaces}">"      return OSMALL;
+
+"</"{s}{m}{a}{l}{l}{whitespaces}">"      return CSMALL;
+
+"<"{s}{u}{b}{whitespaces}">"      return OSUB;
+
+"</"{s}{u}{b}{whitespaces}">"      return CSUB;
+
+"<"{s}{u}{p}{whitespaces}">"      return OSUP;
+
+"</"{s}{u}{p}{whitespaces}">"      return CSUP;
 
 [a-zA-Z0-9 .]+	{
   yylval.str = strdup(yytext);
   return CONTENT;
 }
-"<h1>"      return OHEADONE;
-"<h2>"      return OHEADTWO;
-"<h3>"      return OHEADTHREE;
-"<h4>"      return OHEADFOUR;
-"</h1>"     return CHEADONE;
-"</h2>"     return CHEADTWO;
-"</h3>"     return CHEADTHREE;
-"</h4>"     return CHEADFOUR;
-"<br>"      return LINEBR;
 [ \t\n]+		;
 
 %%
