@@ -9,7 +9,7 @@
 
 %%
 
-"<!DOCTYPE HTML"	{
+"<!"(doctype|DOCTYPE)" "(html|HTML)	{
     BEGIN doctypeseen;
     return ODOCTYPE;
 }
@@ -29,12 +29,19 @@
 "</title>"	return CTITLE;
 "<p>"			  return OPARA;
 "</p>"			return CPARA;
-
 [a-zA-Z0-9 .]+	{
   yylval.str = strdup(yytext);
   return CONTENT;
 }
-
+"<h1>"      return OHEADONE;
+"<h2>"      return OHEADTWO;
+"<h3>"      return OHEADTHREE;
+"<h4>"      return OHEADFOUR;
+"</h1>"     return CHEADONE;
+"</h2>"     return CHEADTWO;
+"</h3>"     return CHEADTHREE;
+"</h4>"     return CHEADFOUR;
+"<br>"      return LINEBR;
 [ \t\n]+		;
 
 %%
