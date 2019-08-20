@@ -240,6 +240,27 @@ hyperlink [a-zA-Z0-9/:.]+
 
 "</"{f}{i}{g}{c}{a}{p}{t}{i}{o}{n}{whitespaces}">"   return CFIGCAPTION;
 
+"<"{t}{a}{b}{l}{e}{whitespaces}">"    return OTABLE;
+
+"</"{t}{a}{b}{l}{e}{whitespaces}">"    return CTABLE;
+
+"<"{c}{a}{p}{t}{i}{o}{n}{whitespaces}">"    return OCAPTION;
+
+"</"{c}{a}{p}{t}{i}{o}{n}{whitespaces}">"    return CCAPTION;
+
+"<"{t}{r}{whitespaces}">"   return OTROW;
+
+"</"{t}{r}{whitespaces}">"   return CTROW;
+
+"<"{t}{h}{whitespaces}">"   return OTHEAD;
+
+"</"{t}{h}{whitespaces}">"   return CTHEAD;
+
+"<"{t}{d}{whitespaces}">"   return OTCOL;
+
+"</"{t}{d}{whitespaces}">"   return CTCOL;
+
+
 [a-zA-Z0-9 .]+	{
   yylval.str = strdup(yytext);
   return CONTENT;
