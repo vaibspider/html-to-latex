@@ -24,6 +24,7 @@
 %token OIMG OIMGSRC CIMGSRC OIMGWIDTH WIDTH CIMGWIDTH OIMGHEIGHT HEIGHT CIMGHEIGHT CIMG
 %token OFIGURE CFIGURE OFIGCAPTION CFIGCAPTION
 %token OTABLE CTABLE OCAPTION CCAPTION OTROW CTROW OTHEAD CTHEAD OTCOL CTCOL
+%token CANGBRKT
 
 
 %union {
@@ -34,65 +35,63 @@
 
 %type <str> TEXT
 %type <str> LINEBR
-%type <str> head_body
 %type <str> head
 %type <str> body
 %type <str> paragraph
-%type <str> paragraphs
 %type <str> body_content
 %type <str> title
 %type <str> content
 %type <str> doctype
-%type <str> optional_content
-%type <str> linebreaks 
 %type <str> h1
 %type <str> h2
 %type <str> h3
 %type <str> h4
 %type <str> header
-%type <str> headers
-%type <str> variable
 
 %%
 
 html_page:
-  doctype OHTML head_body CHTML	{ 
+  OHTML CHTML {
+    printf("<html></html>\n");
+  } |
+  OHTML body CHTML {
+    printf("<html>%s</html>\n", $2);
+  } |
+  OHTML head CHTML {
+    printf("<html>%s</html>\n", $2);
+  } |
+  doctype OHTML CHTML {
+    printf("%s<html></html>\n", $1);
+  } |
+  doctype OHTML head CHTML {
     printf("%s<html>%s</html>\n", $1, $3);
+  } |
+  doctype OHTML body CHTML {
+    printf("%s<html>%s</html>\n", $1, $3);
+  } |
+  OHTML head body CHTML {
+    printf("<html>%s%s</html>\n", $2, $3);
+  } |
+  doctype OHTML head body CHTML	{ 
+    printf("%s<html>%s%s</html>\n", $1, $3, $4);
   }
 
 doctype:
-   ODOCTYPE optional_content CDOCTYPE {
-      if (strcmp($2, "") == 0) {
-        $$ = "<!DOCTYPE HTML>";
-      }
-      else {
-        char *doctype = (char *) malloc((strlen($2) + 16) * sizeof(char));
-        strcpy(doctype, "<!DOCTYPE HTML");
-        strcat(doctype, $2);
-        strcat(doctype, ">");
-        $$ = doctype;
-      }
-    }
-
-optional_content:
-  %empty {
-    $$ = "";
+  ODOCTYPE CANGBRKT {
+    $$ = "<!DOCTYPE HTML>";
   } |
-  content {
-    char *optional_content = (char *) malloc((strlen($1)+1) * sizeof(char));
-    strcpy(optional_content, $1);
-    $$ = optional_content;
-  }
-
-head_body:
-	head body	{
-    char *head_body = (char *) malloc((strlen($1) + strlen($2)) * sizeof(char)); 
-    strcpy(head_body, $1);
-    strcat(head_body, $2);
-    $$ = head_body;	
+  ODOCTYPE TEXT CANGBRKT {
+    char *doctype = (char *) malloc((strlen($2) + 16) * sizeof(char));
+    strcpy(doctype, "<!DOCTYPE HTML");
+    strcat(doctype, $2);
+    strcat(doctype, ">");
+    $$ = doctype;
   }
 
 head:
+  OHEAD CHEAD {
+    $$ = "<head></head>";
+  } |
   OHEAD title CHEAD	{
     char *head = (char *) malloc((strlen($2) + 14) * sizeof(char));
     strcpy(head, "<head>");
@@ -102,7 +101,10 @@ head:
   }
 
 title:
-  OTITLE content CTITLE		{
+  OTITLE CTITLE {
+    $$ = "<title></title>";
+  } |
+  OTITLE TEXT CTITLE		{
     char *title = (char *) malloc((strlen($2) + 16) * sizeof(char));
     strcpy(title, "<title>");
     strcat(title, $2);
@@ -111,6 +113,9 @@ title:
   }
 
 body:
+  OBODY CBODY {
+    $$ = "<body></body>";
+  } |
   OBODY body_content CBODY {
     if (strcmp($2, "") == 0) {
       char *body = (char *) malloc((strlen("<body></body>") + 1) * sizeof(char));
@@ -127,32 +132,31 @@ body:
   }
 
 body_content:
-  %empty {
-    $$ = "";
-  } | 
-  body_content variable {
-    if (strcmp($1, "") == 0) {
-      $$ = $2;
-    }
-    else {
-      char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-      strcpy(body_content, $1);
-      strcat(body_content, $2);
-      $$ = body_content;
-    }
+  TEXT | paragraph | LINEBR | header |
+  body_content TEXT {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content paragraph {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content LINEBR {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content header {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
   }
-
-variable:
-  content | paragraphs | linebreaks | headers
-
-headers:
-  header |
-  headers header {
-      char *headers = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-      strcpy(headers, $1);
-      strcat(headers, $2);
-      $$ = headers;
-    }
 
 header:
   h1 | h2 | h3 | h4;
@@ -193,15 +197,6 @@ h4:
     $$ = h4;
   }
 
-paragraphs:
-  paragraph |
-  paragraphs paragraph {
-    char *paragraphs = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(paragraphs, $1);
-    strcat(paragraphs, $2);
-    $$ = paragraphs;
-  }
-
 paragraph:
   OPARA content CPARA {
     if (strcmp($2, "") == 0) {
@@ -214,15 +209,6 @@ paragraph:
       strcat(paragraph, "</p>");
       $$ = paragraph;
     }
-  }
-
-linebreaks:
-  LINEBR |
-  linebreaks LINEBR {
-    char *linebreaks = (char *) malloc((strlen($1) + 5) * sizeof(char));
-    strcpy(linebreaks, "<br>");
-    strcat(linebreaks, $1);
-    $$ = linebreaks;
   }
 
 content:
