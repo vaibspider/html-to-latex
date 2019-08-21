@@ -53,7 +53,7 @@ alpha [a-zA-Z]
 alphas [a-zA-Z]+
 digit [0-9]
 digits [0-9]+
-specials [-!@#$%\^&*()+=_"';:,./?~`\\|]+
+special [-!@#$%\^&*()+=_"';:,./?~`\\|]
 hyperlink [a-zA-Z0-9/:.]+
 
 %%
@@ -260,17 +260,18 @@ hyperlink [a-zA-Z0-9/:.]+
 
 "</"{t}{d}{whitespaces}">"   return CTCOL;
 
-
-[a-zA-Z0-9 .]+	{
+({alpha}{digit}{special}{whitespaces})+ {
   yylval.str = strdup(yytext);
-  return CONTENT;
+  return TEXT;
 }
 
 ">"	{
   return CANGBRKT;
 }
 
-[ \t\n]+		;
+"<!--"(.|\n)"-->"    ;
+
+{whitespaces}		;
 
 %%
 

@@ -14,7 +14,7 @@
 %token OTITLE CTITLE
 %token OBODY CBODY
 %token OPARA CPARA
-%token CONTENT
+%token TEXT
 %token ODOCTYPE CDOCTYPE
 %token OHEADONE CHEADONE OHEADTWO CHEADTWO OHEADTHREE CHEADTHREE OHEADFOUR CHEADFOUR
 %token LINEBR
@@ -32,7 +32,7 @@
   char *str;
 }
 
-%type <str> CONTENT
+%type <str> TEXT
 %type <str> LINEBR
 %type <str> head_body
 %type <str> head
@@ -226,7 +226,7 @@ linebreaks:
   }
 
 content:
-  CONTENT
+  TEXT
 /*  | body_content
 */
 %%
