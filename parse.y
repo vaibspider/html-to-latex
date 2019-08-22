@@ -19,12 +19,14 @@
 %token OHEADONE CHEADONE OHEADTWO CHEADTWO OHEADTHREE CHEADTHREE OHEADFOUR CHEADFOUR
 %token LINEBR
 %token BEFOREHYPERLINK HYPERLINK OANCHOR CANCHOR
-%token OORDERLIST CORDERLIST OUNORDERLIST CUNORDERLIST OLISTITEM CLISTITEM ODESCTERM CDESCTERM ODESCDESC CDESCDESC
-%token ODIV CDIV OUNDERLINE CUNDERLINE OBOLD CBOLD OITALICIZE CITALICIZE OEMPHASIZE CEMPHASIZE OSTRONG CSTRONG OSMALL CSMALL OSUB CSUB OSUP CSUP
+%token OORDERLIST CORDERLIST OUNORDERLIST CUNORDERLIST OLISTITEM CLISTITEM ODESCTERM CDESCTERM ODESCDESC CDESCDESC ODESCLIST CDESCLIST
+%token ODIV CDIV OUNDERLINE CUNDERLINE OBOLD CBOLD OITALIC CITALIC OEMPHASIS CEMPHASIS OSTRONG CSTRONG OSMALL CSMALL OSUB CSUB OSUP CSUP
 %token OIMG OIMGSRC CIMGSRC OIMGWIDTH WIDTH CIMGWIDTH OIMGHEIGHT HEIGHT CIMGHEIGHT CIMG
 %token OFIGURE CFIGURE OFIGCAPTION CFIGCAPTION
 %token OTABLE CTABLE OCAPTION CCAPTION OTROW CTROW OTHEAD CTHEAD OTCOL CTCOL
 %token CANGBRKT
+
+%define parse.error verbose
 
 
 %union {
@@ -47,6 +49,12 @@
 %type <str> h3
 %type <str> h4
 %type <str> header
+%type <str> anchor BEFOREHYPERLINK HYPERLINK OANCHOR
+%type <str> ordlist unordlist list_item list_items
+%type <str> desclist termsdescs descterm descdesc
+%type <str> div
+%type <str> underline bold italic emphasis strong small sub sup
+%type <str> image src_width_height src width height OIMG CIMG OIMGSRC CIMGSRC OIMGWIDTH CIMGWIDTH OIMGHEIGHT CIMGHEIGHT WIDTH HEIGHT
 
 %%
 
@@ -132,7 +140,8 @@ body:
   }
 
 body_content:
-  TEXT | paragraph | LINEBR | header |
+  TEXT | paragraph | LINEBR | header | anchor | ordlist | unordlist | desclist | div | underline | bold | italic | emphasis | strong | small | sub | 
+  sup | image |
   body_content TEXT {
     char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
     strcpy(body_content, $1);
@@ -156,6 +165,285 @@ body_content:
     strcpy(body_content, $1);
     strcat(body_content, $2);
     $$ = body_content;
+  } |
+  body_content anchor {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content ordlist {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content unordlist {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content desclist {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content div {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content underline {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content bold {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content italic {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content emphasis {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content strong {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content small {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content sub {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content sup {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  } |
+  body_content image {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  }
+
+image:
+  OIMG src_width_height CIMG
+
+src_width_height:
+  src
+  src width
+  width src
+  src height
+  height src
+  src width height
+  src height width
+  height width src
+  height src width
+  width height src
+  width src height
+
+src:
+  OIMGSRC HYPERLINK CIMGSRC
+
+width:
+  OIMGWIDTH WIDTH CIMGWIDTH
+
+height:
+  OIMGHEIGHT HEIGHT CIMGHEIGHT
+
+underline:
+  OUNDERLINE TEXT CUNDERLINE {
+    char *underline = (char *)malloc((strlen($2) + 8) * sizeof(char));
+    strcpy(underline, "<u>");
+    strcat(underline, $2);
+    strcat(underline, "</u>");
+    $$ = underline;
+  }
+
+bold:
+  OBOLD TEXT CBOLD {
+    char *bold = (char *)malloc((strlen($2) + 8) * sizeof(char));
+    strcpy(bold, "<b>");
+    strcat(bold, $2);
+    strcat(bold, "</b>");
+    $$ = bold;
+  }
+
+italic:
+  OITALIC TEXT CITALIC {
+    char *italic = (char *)malloc((strlen($2) + 8) * sizeof(char));
+    strcpy(italic, "<i>");
+    strcat(italic, $2);
+    strcat(italic, "</i>");
+    $$ = italic;
+  }
+
+emphasis:
+  OEMPHASIS TEXT CEMPHASIS {
+    char *emphasis = (char *)malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(emphasis, "<em>");
+    strcat(emphasis, $2);
+    strcat(emphasis, "</em>");
+    $$ = emphasis;
+  }
+
+strong:
+  OSTRONG TEXT CSTRONG {
+    char *strong = (char *)malloc((strlen($2) + 18) * sizeof(char));
+    strcpy(strong, "<strong>");
+    strcat(strong, $2);
+    strcat(strong, "</strong>");
+    $$ = strong;
+  }
+
+small:
+  OSMALL TEXT CSMALL {
+    char *small = (char *)malloc((strlen($2) + 16) * sizeof(char));
+    strcpy(small, "<small>");
+    strcat(small, $2);
+    strcat(small, "</small>");
+    $$ = small;
+  }
+
+sub:
+  OSUB TEXT CSUB {
+    char *sub = (char *)malloc((strlen($2) + 11) * sizeof(char));
+    strcpy(sub, "<sub>");
+    strcat(sub, $2);
+    strcat(sub, "</sub>");
+    $$ = sub;
+  }
+
+sup:
+  OSUP TEXT CSUP {
+    char *sup = (char *)malloc((strlen($2) + 11) * sizeof(char));
+    strcpy(sup, "<sup>");
+    strcat(sup, $2);
+    strcat(sup, "</sup>");
+    $$ = sup;
+  }
+
+div:
+  ODIV TEXT CDIV {
+    char *div = (char *)malloc((strlen($2) + 12) * sizeof(char));
+    strcpy(div, "<div>");
+    strcat(div, $2);
+    strcat(div, "</div>");
+    $$ = div;
+  }
+
+desclist:
+  ODESCLIST termsdescs CDESCLIST {
+    char *desclist= (char *) malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(desclist, "<dl>");
+    strcat(desclist, $2);
+    strcat(desclist, "</dl>");
+    $$ = desclist;
+  }
+
+termsdescs:
+  descterm descdesc {
+    char *termsdescs = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(termsdescs, $1);
+    strcat(termsdescs, $2);
+    $$ = termsdescs;
+  } |
+  termsdescs descterm descdesc {
+    char *termsdescs = (char *) malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    strcpy(termsdescs, $1);
+    strcat(termsdescs, $2);
+    strcat(termsdescs, $3);
+    $$ = termsdescs;
+  }
+
+descterm:
+  ODESCTERM TEXT CDESCTERM {
+    char *descterm= (char *) malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(descterm, "<dt>");
+    strcat(descterm, $2);
+    strcat(descterm, "</dt>");
+    $$ = descterm;
+  }
+
+descdesc:
+  ODESCDESC TEXT CDESCDESC {
+    char *descdesc = (char *) malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(descdesc, "<dd>");
+    strcat(descdesc, $2);
+    strcat(descdesc, "</dd>");
+    $$ = descdesc;
+  }
+
+ordlist:
+  OORDERLIST list_items CORDERLIST {
+    char *ordlist= (char *) malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(ordlist, "<ol>");
+    strcat(ordlist, $2);
+    strcat(ordlist, "</ol>");
+    $$ = ordlist;
+  }
+
+unordlist:
+  OUNORDERLIST list_items CUNORDERLIST {
+    char *unordlist= (char *) malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(unordlist, "<ul>");
+    strcat(unordlist, $2);
+    strcat(unordlist, "</ul>");
+    $$ = unordlist;
+  }
+
+list_items:
+  list_item |
+  list_items list_item {
+    char *listitems= (char *) malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(listitems, $1);
+    strcat(listitems, $2);
+    $$ = listitems;
+  }
+
+list_item:
+  OLISTITEM TEXT CLISTITEM {
+    char *listitem= (char *) malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(listitem, "<li>");
+    strcat(listitem, $2);
+    strcat(listitem, "</li>");
+    $$ = listitem;
+  }
+
+anchor:
+  BEFOREHYPERLINK HYPERLINK OANCHOR TEXT CANCHOR {
+    char *anchor = (char *) malloc((strlen($2) + strlen($4) + 16) * sizeof(char));
+    strcpy(anchor, "<a href=\"");
+    strcat(anchor, $2);
+    strcat(anchor, "\">");
+    strcat(anchor, $4);
+    strcat(anchor, "</a>");
+    $$ = anchor;
   }
 
 header:

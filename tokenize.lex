@@ -216,6 +216,16 @@ alphanumdot ({alpha}|{digit}|[.])
   return CLISTITEM;
 }
 
+"<"{d}{l}{optional_whitespaces}">"     {
+  if (debug == 1) ECHO;
+  return ODESCLIST;
+}
+
+"</"{d}{l}{optional_whitespaces}">"     {
+  if (debug == 1) ECHO;
+  return CDESCLIST;
+}
+
 "<"{d}{t}{optional_whitespaces}">"     {
   if (debug == 1) ECHO;
   return ODESCTERM;
@@ -268,22 +278,22 @@ alphanumdot ({alpha}|{digit}|[.])
 
 "<"{i}{optional_whitespaces}">"      {
   if (debug == 1) ECHO;
-  return OITALICIZE;
+  return OITALIC;
 }
 
 "</"{i}{optional_whitespaces}">"      {
   if (debug == 1) ECHO;
-  return CITALICIZE;
+  return CITALIC;
 }
 
 "<"{e}{m}{optional_whitespaces}">"      {
   if (debug == 1) ECHO;
-  return OEMPHASIZE;
+  return OEMPHASIS;
 }
 
 "</"{e}{m}{optional_whitespaces}">"      {
   if (debug == 1) ECHO;
-  return CEMPHASIZE;
+  return CEMPHASIS;
 }
 
 "<"{s}{t}{r}{o}{n}{g}{optional_whitespaces}">"      {
