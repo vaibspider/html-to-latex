@@ -55,7 +55,7 @@ alpha [a-zA-Z]
 alphas {alpha}+
 digit [0-9]
 digits {digit}+
-special [-!@#$%\^&*()+=_"';:,./?~`\\|]
+special [-{}!@#$%\^&*()+=_';:,./?~`\\|]
 hyperlink ({alpha}|{digit}|[/_:.])+
 alphanumdot ({alpha}|{digit}|[.])
 alphanumspecial ({alpha}|{digit}|{special})
@@ -106,6 +106,11 @@ alphanumspecial ({alpha}|{digit}|{special})
 "</"{t}{i}{t}{l}{e}{optional_whitespaces}">"		{
   if (debug == 1) ECHO;
   return CTITLE;
+}
+
+"<"{a}{optional_whitespaces}">" {
+  if (debug == 1) ECHO;
+  return JUSTOANCHOR;
 }
 
 "<"{a}{optional_whitespaces}{h}{r}{e}{f}{optional_whitespaces}={optional_whitespaces}\" {
@@ -476,7 +481,7 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CTCOL;
 }
 
-{alphanumdot}({whitespace}*{alphanumdot})* {
+{alphanumspecial}({whitespace}*{alphanumspecial})* {
   if (debug == 1) ECHO;
   yylval.str = strdup(yytext);
   return TEXT;
@@ -487,7 +492,7 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CANGBRKT;
 }
 
-"<!--"(.|\n)"-->"    {
+"<!--"(.|\n)*"-->"    {
   if (debug == 1) ECHO;
 }
 

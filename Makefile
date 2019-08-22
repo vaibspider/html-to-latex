@@ -8,6 +8,6 @@ lex.yy.c: tokenize.lex
 	flex tokenize.lex
 
 parse.tab.c: parse.y
-	bison -d -v -t parse.y
+	bison --debug -d -v -t parse.y
 
 
