@@ -56,7 +56,7 @@
 %type <str> underline bold italic emphasis strong small sub sup
 %type <str> image src_width_height src width height OIMG CIMG OIMGSRC CIMGSRC OIMGWIDTH CIMGWIDTH OIMGHEIGHT CIMGHEIGHT WIDTH HEIGHT
 %type <str> table caption trs tr ths th tds td
-%type <str> flow_content
+%type <str> flow_content phrasing_content
 
 %%
 
@@ -151,8 +151,10 @@ body_content:
   }
 
 flow_content:
-  TEXT | anchor | bold | LINEBR | div | desclist | emphasis | header | italic | image | ordlist | paragraph | small | strong | sub | sup | table |
-  underline | unordlist
+  phrasing_content | div | desclist | header | ordlist | paragraph | table | unordlist
+
+phrasing_content:
+  TEXT | anchor | bold | LINEBR | emphasis | italic | image | small | strong | sub | sup | underline
 
 table:
   OTABLE trs CTABLE {
