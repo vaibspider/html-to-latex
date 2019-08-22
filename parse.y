@@ -60,6 +60,9 @@
 %type <str> table caption trs tr thstds th td
 %type <str> flow_content phrasing_content flow_wo_heading flow_wo_heading_table
 %type <str> figure figcaption
+%type <str> paragraph_content h4_content h3_content h2_content h1_content list_item_content div_content
+%type <str> sup_content sub_content small_content strong_content emphasis_content italic_content bold_content underline_content
+%type <str> td_content th_content caption_content1 caption_content2 figcaption_content figure_content
 
 %%
 
@@ -159,7 +162,7 @@ phrasing_content:
   TEXT | anchor | bold | LINEBR | emphasis | italic | image | small | strong | sub | sup | underline
 
 figure:
-  OFIGURE figcaption flow_content CFIGURE {
+  OFIGURE figcaption figure_content CFIGURE {
     char *figure = (char *)malloc((strlen($2) + strlen($3) + 18) * sizeof(char));
     strcpy(figure, "<figure>");
     strcat(figure, $2);
@@ -167,7 +170,7 @@ figure:
     strcat(figure, "</figure>");
     $$ = figure;
   } |
-  OFIGURE flow_content figcaption CFIGURE {
+  OFIGURE figure_content figcaption CFIGURE {
     char *figure = (char *)malloc((strlen($2) + strlen($3) + 18) * sizeof(char));
     strcpy(figure, "<figure>");
     strcat(figure, $2);
@@ -175,7 +178,7 @@ figure:
     strcat(figure, "</figure>");
     $$ = figure;
   } |
-  OFIGURE flow_content CFIGURE {
+  OFIGURE figure_content CFIGURE {
     char *figure = (char *)malloc((strlen($2) + 18) * sizeof(char));
     strcpy(figure, "<figure>");
     strcat(figure, $2);
@@ -183,13 +186,31 @@ figure:
     $$ = figure;
   }
 
+figure_content:
+  flow_content |
+  figure_content flow_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 figcaption:
-  OFIGCAPTION flow_content CFIGCAPTION {
+  OFIGCAPTION figcaption_content CFIGCAPTION {
     char *figcap = (char *)malloc((strlen($2) + 26) * sizeof(char));
     strcpy(figcap, "<figcaption>");
     strcat(figcap, $2);
     strcat(figcap, "</figcaption>");
     $$ = figcap;
+  }
+
+figcaption_content:
+  flow_content |
+  figcaption_content flow_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
   }
 
 table:
@@ -210,18 +231,36 @@ table:
   }
 
 caption: 
-  OCAPTION flow_wo_heading_table CCAPTION {
+  OCAPTION caption_content1 CCAPTION {
     char *a = (char *)malloc((strlen($2) + 20) * sizeof(char));
     strcpy(a, "<caption>");
     strcat(a, $2);
     strcat(a, "</caption>");
     $$ = a;
   } | 
-  OCAPTION header CCAPTION {
+  OCAPTION caption_content2 CCAPTION {
     char *a = (char *)malloc((strlen($2) + 20) * sizeof(char));
     strcpy(a, "<caption>");
     strcat(a, $2);
     strcat(a, "</caption>");
+    $$ = a;
+  }
+
+caption_content1:
+  flow_wo_heading_table |
+  caption_content1 flow_wo_heading_table {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
+caption_content2:
+  header |
+  caption_content2 header {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
     $$ = a;
   }
 
@@ -262,7 +301,7 @@ thstds:
   }
 
 th:
-  OTHEAD flow_wo_heading CTHEAD {
+  OTHEAD th_content CTHEAD {
     char *a = (char *)malloc((strlen($2) + 10) * sizeof(char));
     strcpy(a, "<th>");
     strcat(a, $2);
@@ -270,12 +309,30 @@ th:
     $$ = a;
   }
 
+th_content:
+  flow_wo_heading |
+  th_content flow_wo_heading {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 td:
-  OTCOL flow_content CTCOL {
+  OTCOL td_content CTCOL {
     char *a = (char *)malloc((strlen($2) + 10) * sizeof(char));
     strcpy(a, "<td>");
     strcat(a, $2);
     strcat(a, "</td>");
+    $$ = a;
+  }
+
+td_content:
+  flow_content |
+  td_content flow_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
     $$ = a;
   }
 
@@ -401,7 +458,7 @@ height:
   }
 
 underline:
-  OUNDERLINE phrasing_content CUNDERLINE {
+  OUNDERLINE underline_content CUNDERLINE {
     char *underline = (char *)malloc((strlen($2) + 8) * sizeof(char));
     strcpy(underline, "<u>");
     strcat(underline, $2);
@@ -409,8 +466,17 @@ underline:
     $$ = underline;
   }
 
+underline_content:
+  phrasing_content |
+  underline_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 bold:
-  OBOLD phrasing_content CBOLD {
+  OBOLD bold_content CBOLD {
     char *bold = (char *)malloc((strlen($2) + 8) * sizeof(char));
     strcpy(bold, "<b>");
     strcat(bold, $2);
@@ -418,8 +484,17 @@ bold:
     $$ = bold;
   }
 
+bold_content:
+  phrasing_content |
+  bold_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 italic:
-  OITALIC phrasing_content CITALIC {
+  OITALIC italic_content CITALIC {
     char *italic = (char *)malloc((strlen($2) + 8) * sizeof(char));
     strcpy(italic, "<i>");
     strcat(italic, $2);
@@ -427,8 +502,17 @@ italic:
     $$ = italic;
   }
 
+italic_content:
+  phrasing_content |
+  italic_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 emphasis:
-  OEMPHASIS phrasing_content CEMPHASIS {
+  OEMPHASIS emphasis_content CEMPHASIS {
     char *emphasis = (char *)malloc((strlen($2) + 10) * sizeof(char));
     strcpy(emphasis, "<em>");
     strcat(emphasis, $2);
@@ -436,8 +520,17 @@ emphasis:
     $$ = emphasis;
   }
 
+emphasis_content:
+  phrasing_content |
+  emphasis_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 strong:
-  OSTRONG phrasing_content CSTRONG {
+  OSTRONG strong_content CSTRONG {
     char *strong = (char *)malloc((strlen($2) + 18) * sizeof(char));
     strcpy(strong, "<strong>");
     strcat(strong, $2);
@@ -445,8 +538,17 @@ strong:
     $$ = strong;
   }
 
+strong_content:
+  phrasing_content |
+  strong_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 small:
-  OSMALL phrasing_content CSMALL {
+  OSMALL small_content CSMALL {
     char *small = (char *)malloc((strlen($2) + 16) * sizeof(char));
     strcpy(small, "<small>");
     strcat(small, $2);
@@ -454,8 +556,17 @@ small:
     $$ = small;
   }
 
+small_content:
+  phrasing_content |
+  small_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 sub:
-  OSUB phrasing_content CSUB {
+  OSUB sub_content CSUB {
     char *sub = (char *)malloc((strlen($2) + 11) * sizeof(char));
     strcpy(sub, "<sub>");
     strcat(sub, $2);
@@ -463,8 +574,17 @@ sub:
     $$ = sub;
   }
 
+sub_content:
+  phrasing_content |
+  sub_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 sup:
-  OSUP phrasing_content CSUP {
+  OSUP sup_content CSUP {
     char *sup = (char *)malloc((strlen($2) + 11) * sizeof(char));
     strcpy(sup, "<sup>");
     strcat(sup, $2);
@@ -472,13 +592,31 @@ sup:
     $$ = sup;
   }
 
+sup_content:
+  phrasing_content |
+  sup_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 div:
-  ODIV flow_content CDIV {
+  ODIV div_content CDIV {
     char *div = (char *)malloc((strlen($2) + 12) * sizeof(char));
     strcpy(div, "<div>");
     strcat(div, $2);
     strcat(div, "</div>");
     $$ = div;
+  }
+
+div_content:
+  flow_content |
+  div_content flow_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
   }
 
 desclist:
@@ -578,12 +716,21 @@ list_items:
   }
 
 list_item:
-  OLISTITEM flow_content CLISTITEM {
+  OLISTITEM list_item_content CLISTITEM {
     char *listitem= (char *) malloc((strlen($2) + 10) * sizeof(char));
     strcpy(listitem, "<li>");
     strcat(listitem, $2);
     strcat(listitem, "</li>");
     $$ = listitem;
+  }
+
+list_item_content:
+  flow_content |
+  list_item_content flow_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
   }
 
 anchor:
@@ -608,7 +755,7 @@ header:
   h1 | h2 | h3 | h4;
 
 h1:
-  OHEADONE phrasing_content CHEADONE {
+  OHEADONE h1_content CHEADONE {
     char *h1 = (char *) malloc(strlen($2) + 10);
     strcpy(h1, "<h1>");
     strcat(h1, $2);
@@ -616,8 +763,17 @@ h1:
     $$ = h1;
   }
 
+h1_content:
+  phrasing_content |
+  h1_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 h2:
-  OHEADTWO phrasing_content CHEADTWO {
+  OHEADTWO h2_content CHEADTWO {
     char *h2 = (char *) malloc(strlen($2) + 10);
     strcpy(h2, "<h2>");
     strcat(h2, $2);
@@ -625,8 +781,17 @@ h2:
     $$ = h2;
   }
 
+h2_content:
+  phrasing_content |
+  h2_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 h3:
-  OHEADTHREE phrasing_content CHEADTHREE {
+  OHEADTHREE h3_content CHEADTHREE {
     char *h3 = (char *) malloc(strlen($2) + 10);
     strcpy(h3, "<h3>");
     strcat(h3, $2);
@@ -634,8 +799,17 @@ h3:
     $$ = h3;
   }
 
+h3_content:
+  phrasing_content |
+  h3_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 h4:
-  OHEADFOUR phrasing_content CHEADFOUR {
+  OHEADFOUR h4_content CHEADFOUR {
     char *h4 = (char *) malloc(strlen($2) + 10);
     strcpy(h4, "<h4>");
     strcat(h4, $2);
@@ -643,13 +817,31 @@ h4:
     $$ = h4;
   }
 
+h4_content:
+  phrasing_content |
+  h4_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 paragraph:
-  OPARA phrasing_content CPARA {
+  OPARA paragraph_content CPARA {
     char *paragraph = (char *) malloc(strlen($2) + 8);
     strcpy(paragraph, "<p>");
     strcat(paragraph, $2);
     strcat(paragraph, "</p>");
     $$ = paragraph;
+  }
+
+paragraph_content:
+  phrasing_content |
+  paragraph_content phrasing_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
   }
 
 %%
