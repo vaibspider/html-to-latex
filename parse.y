@@ -56,6 +56,7 @@
 %type <str> underline bold italic emphasis strong small sub sup
 %type <str> image src_width_height src width height OIMG CIMG OIMGSRC CIMGSRC OIMGWIDTH CIMGWIDTH OIMGHEIGHT CIMGHEIGHT WIDTH HEIGHT
 %type <str> table caption trs tr ths th tds td
+%type <str> flow_content
 
 %%
 
@@ -141,122 +142,17 @@ body:
   }
 
 body_content:
-  TEXT | paragraph | LINEBR | header | anchor | ordlist | unordlist | desclist | div | underline | bold | italic | emphasis | strong | small | sub | 
-  sup | image | table |
-  body_content TEXT {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content paragraph {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content LINEBR {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content header {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content anchor {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content ordlist {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content unordlist {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content desclist {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content div {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content underline {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content bold {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content italic {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content emphasis {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content strong {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content small {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content sub {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content sup {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content image {
-    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
-    strcpy(body_content, $1);
-    strcat(body_content, $2);
-    $$ = body_content;
-  } |
-  body_content table {
+  flow_content |
+  body_content flow_content {
     char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
     strcpy(body_content, $1);
     strcat(body_content, $2);
     $$ = body_content;
   }
+
+flow_content:
+  TEXT | anchor | bold | LINEBR | div | desclist | emphasis | header | italic | image | ordlist | paragraph | small | strong | sub | sup | table |
+  underline | unordlist
 
 table:
   OTABLE trs CTABLE {

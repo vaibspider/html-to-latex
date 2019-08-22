@@ -43,21 +43,22 @@ x [xX]
 y [yY]
 z [zZ]
 space [ ]
-spaces [ ]+
+spaces {space}+
 tab   \t
-tabs   [\t]+
+tabs   {tab}+
 newline \n
-newlines [\n]+
+newlines {newline}+
 whitespace [ \t\n]
-whitespaces [ \t\n]+
-optional_whitespaces [ \t\n]*
+whitespaces {whitespace}+
+optional_whitespaces {whitespace}*
 alpha [a-zA-Z]
-alphas [a-zA-Z]+
+alphas {alpha}+
 digit [0-9]
-digits [0-9]+
+digits {digit}+
 special [-!@#$%\^&*()+=_"';:,./?~`\\|]
-hyperlink [a-zA-Z0-9/_:.]+
+hyperlink ({alpha}|{digit}|[/_:.])+
 alphanumdot ({alpha}|{digit}|[.])
+alphanumspecial ({alpha}|{digit}|{special})
 
 %%
 
