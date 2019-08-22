@@ -55,6 +55,7 @@
 %type <str> div
 %type <str> underline bold italic emphasis strong small sub sup
 %type <str> image src_width_height src width height OIMG CIMG OIMGSRC CIMGSRC OIMGWIDTH CIMGWIDTH OIMGHEIGHT CIMGHEIGHT WIDTH HEIGHT
+%type <str> table caption trs tr ths th tds td
 
 %%
 
@@ -141,7 +142,7 @@ body:
 
 body_content:
   TEXT | paragraph | LINEBR | header | anchor | ordlist | unordlist | desclist | div | underline | bold | italic | emphasis | strong | small | sub | 
-  sup | image |
+  sup | image | table |
   body_content TEXT {
     char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
     strcpy(body_content, $1);
@@ -249,6 +250,93 @@ body_content:
     strcpy(body_content, $1);
     strcat(body_content, $2);
     $$ = body_content;
+  } |
+  body_content table {
+    char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(body_content, $1);
+    strcat(body_content, $2);
+    $$ = body_content;
+  }
+
+table:
+  OTABLE trs CTABLE {
+    char *table = (char *)malloc((strlen($2) + 16) * sizeof(char));
+    strcpy(table, "<table>");
+    strcat(table, $2);
+    strcat(table, "</table>");
+    $$ = table;
+  } |
+  OTABLE caption trs CTABLE {
+    char *table = (char *)malloc((strlen($2) + strlen($3) + 16) * sizeof(char));
+    strcpy(table, "<table>");
+    strcat(table, $2);
+    strcat(table, $3);
+    strcat(table, "</table>");
+    $$ = table;
+  }
+
+caption:
+  TEXT
+
+trs:
+  tr |
+  trs tr {
+    char *trow = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(trow, $1);
+    strcat(trow, $2);
+    $$ = trow;
+  }
+
+tr:
+  OTROW ths CTROW {
+    char *a = (char *)malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(a, "<tr>");
+    strcat(a, $2);
+    strcat(a, "</tr>");
+    $$ = a;
+  } |
+  OTROW tds CTROW {
+    char *a = (char *)malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(a, "<tr>");
+    strcat(a, $2);
+    strcat(a, "</tr>");
+    $$ = a;
+  }
+
+ths:
+  th |
+  ths th {
+    char *ths = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(ths, $1);
+    strcat(ths, $2);
+    $$ = ths;
+  }
+
+tds:
+  td |
+  tds td {
+    char *tds = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(tds, $1);
+    strcat(tds, $2);
+    $$ = tds;
+  }
+
+th:
+  OTHEAD TEXT CTHEAD {
+    char *a = (char *)malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(a, "<th>");
+    strcat(a, $2);
+    strcat(a, "</th>");
+    $$ = a;
+  }
+
+td:
+  OTCOL TEXT CTCOL {
+    char *a = (char *)malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(a, "<td>");
+    strcat(a, $2);
+    strcat(a, "</td>");
+    $$ = a;
   }
 
 image:
