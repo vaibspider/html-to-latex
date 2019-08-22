@@ -252,29 +252,125 @@ body_content:
   }
 
 image:
-  OIMG src_width_height CIMG
+  OIMG src_width_height CIMG {
+    char *image = (char *)malloc((strlen($2) + 7) * sizeof(char));
+    strcpy(image, "<img ");
+    strcat(image, $2);
+    strcat(image, ">");
+    $$ = image;
+  }
 
 src_width_height:
-  src
-  src width
-  width src
-  src height
-  height src
-  src width height
-  src height width
-  height width src
-  height src width
-  width height src
-  width src height
+  src |
+  src width {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    $$ = a;
+  } |
+  width src {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    $$ = a;
+  } |
+  src height {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    $$ = a;
+  } |
+  height src {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    $$ = a;
+  } |
+  src width height {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    strcat(a, " ");
+    strcat(a, $3);
+    $$ = a;
+  } |
+  src height width {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    strcat(a, " ");
+    strcat(a, $3);
+    $$ = a;
+  } |
+  height width src {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    strcat(a, " ");
+    strcat(a, $3);
+    $$ = a;
+  } |
+  height src width {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    strcat(a, " ");
+    strcat(a, $3);
+    $$ = a;
+  } |
+  width height src {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    strcat(a, " ");
+    strcat(a, $3);
+    $$ = a;
+  } |
+  width src height {
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    strcpy(a, $1);
+    strcat(a, " ");
+    strcat(a, $2);
+    strcat(a, " ");
+    strcat(a, $3);
+    $$ = a;
+  }
 
 src:
-  OIMGSRC HYPERLINK CIMGSRC
+  OIMGSRC HYPERLINK CIMGSRC {
+    char *src = (char *)malloc((strlen($2) + 7) * sizeof(char));
+    strcpy(src, "src=\"");
+    strcat(src, $2);
+    strcat(src, "\"");
+    $$ = src;
+  }
 
 width:
-  OIMGWIDTH WIDTH CIMGWIDTH
+  OIMGWIDTH WIDTH CIMGWIDTH {
+    char *width = (char *)malloc((strlen($2) + 9) * sizeof(char));
+    strcpy(width, "width=\"");
+    strcat(width, $2);
+    strcat(width, "\"");
+    $$ = width;
+  }
 
 height:
-  OIMGHEIGHT HEIGHT CIMGHEIGHT
+  OIMGHEIGHT HEIGHT CIMGHEIGHT {
+    char *height = (char *)malloc((strlen($2) + 10) * sizeof(char));
+    strcpy(height, "height=\"");
+    strcat(height, $2);
+    strcat(height, "\"");
+    $$ = height;
+  }
 
 underline:
   OUNDERLINE TEXT CUNDERLINE {

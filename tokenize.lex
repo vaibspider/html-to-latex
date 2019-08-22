@@ -56,7 +56,7 @@ alphas [a-zA-Z]+
 digit [0-9]
 digits [0-9]+
 special [-!@#$%\^&*()+=_"';:,./?~`\\|]
-hyperlink [a-zA-Z0-9/:.]+
+hyperlink [a-zA-Z0-9/_:.]+
 alphanumdot ({alpha}|{digit}|[.])
 
 %%
@@ -351,6 +351,7 @@ alphanumdot ({alpha}|{digit}|[.])
 <imgsrc>{hyperlink} {
   if (debug == 1) ECHO;
   BEGIN imghyperlink;
+  yylval.str = strdup(yytext);
   return HYPERLINK;
 }
 
@@ -369,6 +370,7 @@ alphanumdot ({alpha}|{digit}|[.])
 <imgwidth>{digits} {
   if (debug == 1) ECHO;
   BEGIN widthdigit;
+  yylval.str = strdup(yytext);
   return WIDTH;
 }
 
@@ -387,6 +389,7 @@ alphanumdot ({alpha}|{digit}|[.])
 <imgheight>{digits} {
   if (debug == 1) ECHO;
   BEGIN heightdigit;
+  yylval.str = strdup(yytext);
   return HEIGHT;
 }
 
