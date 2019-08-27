@@ -51,7 +51,6 @@ newline \n
 newlines {newline}+
 whitespace [ \t\n]
 whitespaces {whitespace}+
-optional_whitespaces {whitespace}*
 alpha [a-zA-Z]
 alphas {alpha}+
 digit [0-9]
@@ -81,52 +80,52 @@ alphanumspecial ({alpha}|{digit}|{special})
   return ODOCTYPE;
 }
 
-"<"{h}{t}{m}{l}{optional_whitespaces}">" {
+"<"{h}{t}{m}{l}{whitespace}*">" {
   if (debug == 1) ECHO;
   return OHTML;
 }
 
-"</"{h}{t}{m}{l}{optional_whitespaces}">"  {
+"</"{h}{t}{m}{l}{whitespace}*">"  {
   if (debug == 1) ECHO;
   return CHTML;
 }
 
-"<"{h}{e}{a}{d}{optional_whitespaces}">"		    {
+"<"{h}{e}{a}{d}{whitespace}*">"		    {
   if (debug == 1) ECHO;
   return OHEAD;
 }
 
-"</"{h}{e}{a}{d}{optional_whitespaces}">"		  {
+"</"{h}{e}{a}{d}{whitespace}*">"		  {
   if (debug == 1) ECHO;
   return CHEAD;
 }
 
-"<"{b}{o}{d}{y}{optional_whitespaces}">"		    {
+"<"{b}{o}{d}{y}{whitespace}*">"		    {
   if (debug == 1) ECHO;
   return OBODY;
 }
 
-"</"{b}{o}{d}{y}{optional_whitespaces}">"		  {
+"</"{b}{o}{d}{y}{whitespace}*">"		  {
   if (debug == 1) ECHO;
   return CBODY;
 }
 
-"<"{t}{i}{t}{l}{e}{optional_whitespaces}">"		{
+"<"{t}{i}{t}{l}{e}{whitespace}*">"		{
   if (debug == 1) ECHO;
   return OTITLE;
 }
 
-"</"{t}{i}{t}{l}{e}{optional_whitespaces}">"		{
+"</"{t}{i}{t}{l}{e}{whitespace}*">"		{
   if (debug == 1) ECHO;
   return CTITLE;
 }
 
-"<"{a}{optional_whitespaces}">" {
+"<"{a}{whitespace}*">" {
   if (debug == 1) ECHO;
   return JUSTOANCHOR;
 }
 
-"<"{a}{optional_whitespaces}{h}{r}{e}{f}{optional_whitespaces}={optional_whitespaces}\" {
+"<"{a}{whitespace}*{h}{r}{e}{f}{whitespace}*={whitespace}*["'] {
   if (debug == 1) ECHO;
   BEGIN beforehyperlink;
   return BEFOREHYPERLINK;
@@ -139,218 +138,218 @@ alphanumspecial ({alpha}|{digit}|{special})
   return HYPERLINK;
 }
 
-<hyperlink>\"{optional_whitespaces}">" {
+<hyperlink>["']{whitespace}*">" {
   if (debug == 1) ECHO;
   BEGIN INITIAL;
   return OANCHOR;
 }
 
-"</"{a}{optional_whitespaces}">" {
+"</"{a}{whitespace}*">" {
   if (debug == 1) ECHO;
   return CANCHOR;
 }
 
-"<"{b}{r}{optional_whitespaces}">"    {
+"<"{b}{r}{whitespace}*">"    {
   if (debug == 1) ECHO;
   return LINEBR;
 }
 
-"<"{p}{optional_whitespaces}">"			 {
+"<"{p}{whitespace}*">"			 {
   if (debug == 1) ECHO;
   return OPARA;
 }
 
-"</"{p}{optional_whitespaces}">"			 {
+"</"{p}{whitespace}*">"			 {
   if (debug == 1) ECHO;
   return CPARA;
 }
 
-"<"{h}1{optional_whitespaces}">"       {
+"<"{h}1{whitespace}*">"       {
   if (debug == 1) ECHO;
   return OHEADONE;
 }
 
-"</"{h}1{optional_whitespaces}">"       {
+"</"{h}1{whitespace}*">"       {
   if (debug == 1) ECHO;
   return CHEADONE;
 }
 
-"<"{h}2{optional_whitespaces}">"       {
+"<"{h}2{whitespace}*">"       {
   if (debug == 1) ECHO;
   return OHEADTWO;
 }
 
-"</"{h}2{optional_whitespaces}">"       {
+"</"{h}2{whitespace}*">"       {
   if (debug == 1) ECHO;
   return CHEADTWO;
 }
 
-"<"{h}3{optional_whitespaces}">"       {
+"<"{h}3{whitespace}*">"       {
   if (debug == 1) ECHO;
   return OHEADTHREE;
 }
 
-"</"{h}3{optional_whitespaces}">"       {
+"</"{h}3{whitespace}*">"       {
   if (debug == 1) ECHO;
   return CHEADTHREE;
 }
 
-"<"{h}4{optional_whitespaces}">"       {
+"<"{h}4{whitespace}*">"       {
   if (debug == 1) ECHO;
   return OHEADFOUR;
 }
 
-"</"{h}4{optional_whitespaces}">"       {
+"</"{h}4{whitespace}*">"       {
   if (debug == 1) ECHO;
   return CHEADFOUR;
 }
 
-"<"{o}{l}{optional_whitespaces}">"     {
+"<"{o}{l}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return OORDERLIST;
 }
 
-"</"{o}{l}{optional_whitespaces}">"     {
+"</"{o}{l}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return CORDERLIST;
 }
 
-"<"{u}{l}{optional_whitespaces}">"     {
+"<"{u}{l}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return OUNORDERLIST;
 }
 
-"</"{u}{l}{optional_whitespaces}">"     {
+"</"{u}{l}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return CUNORDERLIST;
 }
 
-"<"{l}{i}{optional_whitespaces}">"     {
+"<"{l}{i}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return OLISTITEM;
 }
 
-"</"{l}{i}{optional_whitespaces}">"     {
+"</"{l}{i}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return CLISTITEM;
 }
 
-"<"{d}{l}{optional_whitespaces}">"     {
+"<"{d}{l}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return ODESCLIST;
 }
 
-"</"{d}{l}{optional_whitespaces}">"     {
+"</"{d}{l}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return CDESCLIST;
 }
 
-"<"{d}{t}{optional_whitespaces}">"     {
+"<"{d}{t}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return ODESCTERM;
 }
 
-"</"{d}{t}{optional_whitespaces}">"     {
+"</"{d}{t}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return CDESCTERM;
 }
 
-"<"{d}{d}{optional_whitespaces}">"     {
+"<"{d}{d}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return ODESCDESC;
 }
 
-"</"{d}{d}{optional_whitespaces}">"     {
+"</"{d}{d}{whitespace}*">"     {
   if (debug == 1) ECHO;
   return CDESCDESC;
 }
 
-"<"{d}{i}{v}{optional_whitespaces}">"    {
+"<"{d}{i}{v}{whitespace}*">"    {
   if (debug == 1) ECHO;
   return ODIV;
 }
 
-"</"{d}{i}{v}{optional_whitespaces}">"    {
+"</"{d}{i}{v}{whitespace}*">"    {
   if (debug == 1) ECHO;
   return CDIV;
 }
 
-"<"{u}{optional_whitespaces}">"      {
+"<"{u}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return OUNDERLINE;
 }
 
-"</"{u}{optional_whitespaces}">"      {
+"</"{u}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return CUNDERLINE;
 }
 
-"<"{b}{optional_whitespaces}">"      {
+"<"{b}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return OBOLD;
 }
 
-"</"{b}{optional_whitespaces}">"      {
+"</"{b}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return CBOLD;
 }
 
-"<"{i}{optional_whitespaces}">"      {
+"<"{i}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return OITALIC;
 }
 
-"</"{i}{optional_whitespaces}">"      {
+"</"{i}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return CITALIC;
 }
 
-"<"{e}{m}{optional_whitespaces}">"      {
+"<"{e}{m}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return OEMPHASIS;
 }
 
-"</"{e}{m}{optional_whitespaces}">"      {
+"</"{e}{m}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return CEMPHASIS;
 }
 
-"<"{s}{t}{r}{o}{n}{g}{optional_whitespaces}">"      {
+"<"{s}{t}{r}{o}{n}{g}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return OSTRONG;
 }
 
-"</"{s}{t}{r}{o}{n}{g}{optional_whitespaces}">"      {
+"</"{s}{t}{r}{o}{n}{g}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return CSTRONG;
 }
 
-"<"{s}{m}{a}{l}{l}{optional_whitespaces}">"      {
+"<"{s}{m}{a}{l}{l}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return OSMALL;
 }
 
-"</"{s}{m}{a}{l}{l}{optional_whitespaces}">"      {
+"</"{s}{m}{a}{l}{l}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return CSMALL;
 }
 
-"<"{s}{u}{b}{optional_whitespaces}">"      {
+"<"{s}{u}{b}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return OSUB;
 }
 
-"</"{s}{u}{b}{optional_whitespaces}">"      {
+"</"{s}{u}{b}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return CSUB;
 }
 
-"<"{s}{u}{p}{optional_whitespaces}">"      {
+"<"{s}{u}{p}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return OSUP;
 }
 
-"</"{s}{u}{p}{optional_whitespaces}">"      {
+"</"{s}{u}{p}{whitespace}*">"      {
   if (debug == 1) ECHO;
   return CSUP;
 }
@@ -361,7 +360,7 @@ alphanumspecial ({alpha}|{digit}|{special})
   return OIMG;
 }
 
-<img>{s}{r}{c}{optional_whitespaces}={optional_whitespaces}\"  {
+<img>{s}{r}{c}{whitespace}*={whitespace}*["']  {
   if (debug == 1) ECHO;
   BEGIN imgsrc;
   return OIMGSRC;
@@ -374,13 +373,13 @@ alphanumspecial ({alpha}|{digit}|{special})
   return HYPERLINK;
 }
 
-<imghyperlink>\" {
+<imghyperlink>["'] {
   if (debug == 1) ECHO;
   BEGIN img;
   return CIMGSRC;
 }
 
-<img>{w}{i}{d}{t}{h}{optional_whitespaces}={optional_whitespaces}\" {
+<img>{w}{i}{d}{t}{h}{whitespace}*={whitespace}*["'] {
   if (debug == 1) ECHO;
   BEGIN imgwidth;
   return OIMGWIDTH;
@@ -393,13 +392,13 @@ alphanumspecial ({alpha}|{digit}|{special})
   return WIDTH;
 }
 
-<widthdigit>\" {
+<widthdigit>["'] {
   if (debug == 1) ECHO;
   BEGIN img;
   return CIMGWIDTH;
 }
 
-<img>{h}{e}{i}{g}{h}{t}{optional_whitespaces}={optional_whitespaces}\" {
+<img>{h}{e}{i}{g}{h}{t}{whitespace}*={whitespace}*["'] {
   if (debug == 1) ECHO;
   BEGIN imgheight;
   return OIMGHEIGHT;
@@ -412,7 +411,7 @@ alphanumspecial ({alpha}|{digit}|{special})
   return HEIGHT;
 }
 
-<heightdigit>\" {
+<heightdigit>["'] {
   if (debug == 1) ECHO;
   BEGIN img;
   return CIMGHEIGHT;
@@ -424,72 +423,72 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CIMG;
 }
 
-"<"{f}{i}{g}{u}{r}{e}{optional_whitespaces}">"   {
+"<"{f}{i}{g}{u}{r}{e}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return OFIGURE;
 }
 
-"</"{f}{i}{g}{u}{r}{e}{optional_whitespaces}">"   {
+"</"{f}{i}{g}{u}{r}{e}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return CFIGURE;
 }
 
-"<"{f}{i}{g}{c}{a}{p}{t}{i}{o}{n}{optional_whitespaces}">"   {
+"<"{f}{i}{g}{c}{a}{p}{t}{i}{o}{n}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return OFIGCAPTION;
 }
 
-"</"{f}{i}{g}{c}{a}{p}{t}{i}{o}{n}{optional_whitespaces}">"   {
+"</"{f}{i}{g}{c}{a}{p}{t}{i}{o}{n}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return CFIGCAPTION;
 }
 
-"<"{t}{a}{b}{l}{e}{optional_whitespaces}">"    {
+"<"{t}{a}{b}{l}{e}{whitespace}*">"    {
   if (debug == 1) ECHO;
   return OTABLE;
 }
 
-"</"{t}{a}{b}{l}{e}{optional_whitespaces}">"    {
+"</"{t}{a}{b}{l}{e}{whitespace}*">"    {
   if (debug == 1) ECHO;
   return CTABLE;
 }
 
-"<"{c}{a}{p}{t}{i}{o}{n}{optional_whitespaces}">"    {
+"<"{c}{a}{p}{t}{i}{o}{n}{whitespace}*">"    {
   if (debug == 1) ECHO;
   return OCAPTION;
 }
 
-"</"{c}{a}{p}{t}{i}{o}{n}{optional_whitespaces}">"    {
+"</"{c}{a}{p}{t}{i}{o}{n}{whitespace}*">"    {
   if (debug == 1) ECHO;
   return CCAPTION;
 }
 
-"<"{t}{r}{optional_whitespaces}">"   {
+"<"{t}{r}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return OTROW;
 }
 
-"</"{t}{r}{optional_whitespaces}">"   {
+"</"{t}{r}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return CTROW;
 }
 
-"<"{t}{h}{optional_whitespaces}">"   {
+"<"{t}{h}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return OTHEAD;
 }
 
-"</"{t}{h}{optional_whitespaces}">"   {
+"</"{t}{h}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return CTHEAD;
 }
 
-"<"{t}{d}{optional_whitespaces}">"   {
+"<"{t}{d}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return OTCOL;
 }
 
-"</"{t}{d}{optional_whitespaces}">"   {
+"</"{t}{d}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return CTCOL;
 }
