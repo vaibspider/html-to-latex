@@ -15,6 +15,7 @@
 %start imgwidth
 %start widthdigit
 %start heightdigit
+%start in_comment
 
 a [aA]
 b [bB]
@@ -61,6 +62,18 @@ alphanumdot ({alpha}|{digit}|[.])
 alphanumspecial ({alpha}|{digit}|{special})
 
 %%
+
+<INITIAL>{
+  "<!--" {BEGIN in_comment;
+  /*printf("comment started.......\n");*/}
+}
+
+<in_comment>{
+  "-->" {BEGIN INITIAL; /*printf("comment ended........\n");*/ }
+  [^-\n]+ {/*printf("comment::%s::comment\n", yytext);*/}
+  [-]+ {/*printf("comment::%s::comment\n", yytext);*/}
+  \n  ;
+}
 
 "<!"{d}{o}{c}{t}{y}{p}{e}{whitespaces}{h}{t}{m}{l} {
   if (debug == 1) ECHO;
@@ -481,19 +494,16 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CTCOL;
 }
 
-{alphanumspecial}({whitespace}*{alphanumspecial})* {
+<INITIAL>{alphanumspecial}({whitespace}*{alphanumspecial})* {
   if (debug == 1) ECHO;
   yylval.str = strdup(yytext);
+  /*printf("TEXT::%s::TEXT\n", yytext);*/
   return TEXT;
 }
 
 ">"	{
   if (debug == 1) ECHO;
   return CANGBRKT;
-}
-
-"<!--"(.|\n)*"-->"    {
-  if (debug == 1) ECHO;
 }
 
 {whitespaces}		{

@@ -159,7 +159,10 @@ flow_wo_heading:
   table | flow_wo_heading_table
 
 phrasing_content:
-  TEXT | anchor | bold | LINEBR | emphasis | italic | image | small | strong | sub | sup | underline
+  TEXT | anchor | bold | emphasis | italic | image | small | strong | sub | sup | underline |
+  LINEBR {
+    $$ = "<br>";
+  }
 
 figure:
   OFIGURE figcaption figure_content CFIGURE {
@@ -348,35 +351,35 @@ image:
 src_width_height:
   src |
   src width {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + 2) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
     $$ = a;
   } |
   width src {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + 2) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
     $$ = a;
   } |
   src height {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + 2) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
     $$ = a;
   } |
   height src {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + 2) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
     $$ = a;
   } |
   src width height {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 3) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
@@ -385,7 +388,7 @@ src_width_height:
     $$ = a;
   } |
   src height width {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 3) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
@@ -394,7 +397,7 @@ src_width_height:
     $$ = a;
   } |
   height width src {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 3) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
@@ -403,7 +406,7 @@ src_width_height:
     $$ = a;
   } |
   height src width {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 3) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
@@ -412,7 +415,7 @@ src_width_height:
     $$ = a;
   } |
   width height src {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 3) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
@@ -421,7 +424,7 @@ src_width_height:
     $$ = a;
   } |
   width src height {
-    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 1) * sizeof(char));
+    char *a = (char *)malloc((strlen($1) + strlen($2) + strlen($3) + 3) * sizeof(char));
     strcpy(a, $1);
     strcat(a, " ");
     strcat(a, $2);
@@ -734,6 +737,7 @@ list_item_content:
   }
 
 anchor:
+  /* Empty anchor tag not supported yet */
   JUSTOANCHOR TEXT CANCHOR {
     char *anchor = (char *) malloc((strlen($2) + 5) * sizeof(char));
     strcpy(anchor, "<a>");
@@ -846,7 +850,7 @@ paragraph_content:
 
 %%
 
-int main() {
+int main(int argc, char **argv) {
     yyparse();
     return 0;
 }
