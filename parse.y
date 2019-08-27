@@ -27,7 +27,7 @@
 %token OTABLE CTABLE OCAPTION CCAPTION OTROW CTROW OTHEAD CTHEAD OTCOL CTCOL
 %token CANGBRKT
 %token JUSTOANCHOR
-%token BEFORESIZE FONTSIZE OFONT CFONT
+%token BEFORESIZE FONTSIZE OFONT CFONT OCENTER CCENTER
 
 %define parse.error verbose
 /*%define parse.lac full*/
@@ -64,7 +64,7 @@
 %type <str> paragraph_content h4_content h3_content h2_content h1_content list_item_content div_content
 %type <str> sup_content sub_content small_content strong_content emphasis_content italic_content bold_content underline_content
 %type <str> td_content th_content caption_content1 caption_content2 figcaption_content figure_content
-%type <str> font font_content FONTSIZE
+%type <str> font font_content FONTSIZE center center_content
 
 %%
 
@@ -161,9 +161,27 @@ flow_wo_heading:
   table | flow_wo_heading_table
 
 phrasing_content:
-  TEXT | anchor | bold | emphasis | italic | image | small | strong | sub | sup | underline | font |
+  TEXT | anchor | bold | emphasis | italic | image | small | strong | sub | sup | underline | font | center |
   LINEBR {
     $$ = "<br>";
+  }
+
+center:
+  OCENTER center_content CCENTER {
+    char *center = (char *)malloc((strlen($2) + 18) * sizeof(char));
+    strcpy(center, "<center>");
+    strcat(center, $2);
+    strcat(center, "</center>");
+    $$ = center;
+  }
+
+center_content:
+  flow_content |
+  center_content flow_content {
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
   }
 
 font:

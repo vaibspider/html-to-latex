@@ -515,6 +515,14 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CFONT;
 }
 
+"<"{c}{e}{n}{t}{e}{r}{whitespace}*">" {
+  return OCENTER;
+}
+
+"</"{c}{e}{n}{t}{e}{r}{whitespace}*">" {
+  return CCENTER;
+}
+
 <INITIAL>{alphanumspecial}({whitespace}*{alphanumspecial})* {
   if (debug == 1) ECHO;
   yylval.str = strdup(yytext);
