@@ -149,7 +149,7 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CANCHOR;
 }
 
-"<"{b}{r}{whitespace}*">"    {
+"<"{b}{r}{whitespace}*\/?">"    {
   if (debug == 1) ECHO;
   return LINEBR;
 }
@@ -417,7 +417,7 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CIMGHEIGHT;
 }
 
-<img>">" {
+<img>\/?">" {
   if (debug == 1) ECHO;
   BEGIN INITIAL;
   return CIMG;
