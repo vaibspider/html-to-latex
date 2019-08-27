@@ -523,6 +523,14 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CCENTER;
 }
 
+"<"{t}{t}{whitespace}*">" {
+  return OTELETYPE;
+}
+
+"</"{t}{t}{whitespace}*">" {
+  return CTELETYPE;
+}
+
 <INITIAL>{alphanumspecial}({whitespace}*{alphanumspecial})* {
   if (debug == 1) ECHO;
   yylval.str = strdup(yytext);
