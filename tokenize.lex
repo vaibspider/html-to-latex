@@ -16,6 +16,8 @@
 %start widthdigit
 %start heightdigit
 %start in_comment
+%start fontsize
+%start beforesize
 
 a [aA]
 b [bB]
@@ -491,6 +493,26 @@ alphanumspecial ({alpha}|{digit}|{special})
 "</"{t}{d}{whitespace}*">"   {
   if (debug == 1) ECHO;
   return CTCOL;
+}
+
+"<"{f}{o}{n}{t}{whitespace}+{s}{i}{z}{e}{whitespace}*={whitespace}*["'] {
+  BEGIN beforesize;
+  return BEFORESIZE;
+}
+
+<beforesize>{digits} {
+  BEGIN fontsize;
+  yylval.str = strdup(yytext);
+  return FONTSIZE;
+}
+
+<fontsize>["']{whitespace}*">" {
+  BEGIN INITIAL;
+  return OFONT;
+}
+
+"</"{f}{o}{n}{t}{whitespace}*">" {
+  return CFONT;
 }
 
 <INITIAL>{alphanumspecial}({whitespace}*{alphanumspecial})* {
