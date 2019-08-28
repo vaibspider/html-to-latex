@@ -2,8 +2,22 @@
   #include <stdio.h>
   #include <string.h>
   int yylex(void);
-  void yyerror(char *s);
+  void yyerror(const char *s);
   #define YYDEBUG 1
+
+  #define FLOW       0
+  #define PHRASE     1
+  #define FLOW_T_H_A 2        /* flow minus table, anchor and heading */
+  #define FLOW_T_H   3        /* flow minus table and heading */
+  #define FLOW_T     4        /* flow minus table */
+  #define FLOW_H     5        /* flow minus heading */
+  #define FLOW_A     6        /* flow minus anchor */
+  #define HEADER     7
+  #define TABLE      8
+  #define ANCHOR     9
+
+  int type = FLOW;
+
 %}
 
 /*%define lr.type canonical-lr*/
@@ -65,6 +79,7 @@
 %type <str> sup_content sub_content small_content strong_content emphasis_content italic_content bold_content underline_content
 %type <str> td_content th_content caption_content1 caption_content2 figcaption_content figure_content
 %type <str> font font_content FONTSIZE center center_content teletype teletype_content
+%type <str> descterm_content descdesc_content
 
 %%
 
@@ -143,8 +158,9 @@ body:
   }
 
 body_content:
-  flow_content |
+  flow_content {type = FLOW;} |
   body_content flow_content {
+    type = FLOW;
     char *body_content = (char *)malloc((strlen($1) + strlen($2) + 1) * sizeof(char));
     strcpy(body_content, $1);
     strcat(body_content, $2);
@@ -155,13 +171,16 @@ flow_content:
   header | flow_wo_heading_table | table
 
 flow_wo_heading_table:
-  phrasing_content | div | desclist | ordlist | paragraph | unordlist | figure
+  phrasing_content | div | desclist | ordlist | 
+  paragraph | unordlist | figure 
 
 flow_wo_heading:
   table | flow_wo_heading_table
 
 phrasing_content:
-  TEXT | anchor | bold | emphasis | italic | image | small | strong | sub | sup | underline | font | center | teletype |
+  TEXT | anchor | bold | emphasis | italic | image | 
+  small | strong | sub | sup | underline | center |
+  font | teletype |
   LINEBR {
     $$ = "<br>";
   }
@@ -176,8 +195,9 @@ teletype:
   }
 
 teletype_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   teletype_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -194,8 +214,9 @@ center:
   }
 
 center_content:
-  flow_content |
+  flow_content {type = FLOW;} |
   center_content flow_content {
+    type = FLOW;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -214,8 +235,9 @@ font:
   }
 
 font_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   font_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -248,8 +270,9 @@ figure:
   }
 
 figure_content:
-  flow_content |
+  flow_content {type = FLOW;} |
   figure_content flow_content {
+    type = FLOW;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -266,8 +289,9 @@ figcaption:
   }
 
 figcaption_content:
-  flow_content |
+  flow_content {type = FLOW;} |
   figcaption_content flow_content {
+    type = FLOW;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -291,6 +315,7 @@ table:
     $$ = table;
   }
 
+/* caption contents 1 and 2 can be combined into one */
 caption: 
   OCAPTION caption_content1 CCAPTION {
     char *a = (char *)malloc((strlen($2) + 20) * sizeof(char));
@@ -308,8 +333,9 @@ caption:
   }
 
 caption_content1:
-  flow_wo_heading_table |
+  flow_wo_heading_table {type = FLOW_T_H;} |
   caption_content1 flow_wo_heading_table {
+    type = FLOW_T_H;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -317,8 +343,9 @@ caption_content1:
   }
 
 caption_content2:
-  header |
+  header {type = HEADER;} |
   caption_content2 header {
+    type = HEADER;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -371,8 +398,9 @@ th:
   }
 
 th_content:
-  flow_wo_heading |
+  flow_wo_heading {type = FLOW_H;} |
   th_content flow_wo_heading {
+    type = FLOW_H;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -389,8 +417,9 @@ td:
   }
 
 td_content:
-  flow_content |
+  flow_content {type = FLOW;} |
   td_content flow_content {
+    type = FLOW;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -528,8 +557,9 @@ underline:
   }
 
 underline_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   underline_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -546,8 +576,9 @@ bold:
   }
 
 bold_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   bold_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -564,8 +595,9 @@ italic:
   }
 
 italic_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   italic_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -582,8 +614,9 @@ emphasis:
   }
 
 emphasis_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   emphasis_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -600,8 +633,9 @@ strong:
   }
 
 strong_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   strong_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -618,8 +652,9 @@ small:
   }
 
 small_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   small_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -636,8 +671,9 @@ sub:
   }
 
 sub_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   sub_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -654,8 +690,9 @@ sup:
   }
 
 sup_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   sup_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -672,8 +709,9 @@ div:
   }
 
 div_content:
-  flow_content |
+  flow_content {type = FLOW;} |
   div_content flow_content {
+    type = FLOW;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -726,7 +764,7 @@ descs:
   }
 
 descterm:
-  ODESCTERM TEXT CDESCTERM {
+  ODESCTERM descterm_content CDESCTERM {
     char *descterm= (char *) malloc((strlen($2) + 10) * sizeof(char));
     strcpy(descterm, "<dt>");
     strcat(descterm, $2);
@@ -734,13 +772,33 @@ descterm:
     $$ = descterm;
   }
 
+descterm_content:
+  flow_wo_heading {type = FLOW_H;} |
+  descterm_content flow_wo_heading {
+    type = FLOW_H;
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
+  }
+
 descdesc:
-  ODESCDESC TEXT CDESCDESC {
+  ODESCDESC descdesc_content CDESCDESC {
     char *descdesc = (char *) malloc((strlen($2) + 10) * sizeof(char));
     strcpy(descdesc, "<dd>");
     strcat(descdesc, $2);
     strcat(descdesc, "</dd>");
     $$ = descdesc;
+  }
+
+descdesc_content:
+  flow_content {type = FLOW;} |
+  descdesc_content flow_content {
+    type = FLOW;
+    char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
+    strcpy(a, $1);
+    strcat(a, $2);
+    $$ = a;
   }
 
 ordlist:
@@ -786,8 +844,9 @@ list_item:
   }
 
 list_item_content:
-  flow_content |
+  flow_content {type = FLOW;} |
   list_item_content flow_content {
+    type = FLOW;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -795,12 +854,22 @@ list_item_content:
   }
 
 anchor:
-  /* Empty anchor tag not supported yet */
+  JUSTOANCHOR CANCHOR {
+    $$ = "<a></a>";
+  } |
+  BEFOREHYPERLINK HYPERLINK OANCHOR CANCHOR {
+    char *anchor = (char *) malloc((strlen($2) + 16) * sizeof(char));
+    strcpy(anchor, "<a href=\"");
+    strcat(anchor, $2);
+    strcat(anchor, "\">");
+    strcat(anchor, "</a>");
+    $$ = anchor;
+  } |
   JUSTOANCHOR TEXT CANCHOR {
-    char *anchor = (char *) malloc((strlen($2) + 5) * sizeof(char));
+    char *anchor = (char *) malloc((strlen($2) + 8) * sizeof(char));
     strcpy(anchor, "<a>");
     strcat(anchor, $2);
-    strcat(anchor, ">");
+    strcat(anchor, "</a>");
     $$ = anchor;
   } |
   BEFOREHYPERLINK HYPERLINK OANCHOR TEXT CANCHOR {
@@ -826,8 +895,9 @@ h1:
   }
 
 h1_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   h1_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -844,8 +914,9 @@ h2:
   }
 
 h2_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   h2_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -862,8 +933,9 @@ h3:
   }
 
 h3_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   h3_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -880,8 +952,9 @@ h4:
   }
 
 h4_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   h4_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);
@@ -898,8 +971,9 @@ paragraph:
   }
 
 paragraph_content:
-  phrasing_content |
+  phrasing_content {type = PHRASE;} |
   paragraph_content phrasing_content {
+    type = PHRASE;
     char *a = (char *) malloc(strlen($1) + strlen($2) + 1);
     strcpy(a, $1);
     strcat(a, $2);

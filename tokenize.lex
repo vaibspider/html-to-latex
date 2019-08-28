@@ -57,8 +57,9 @@ alpha [a-zA-Z]
 alphas {alpha}+
 digit [0-9]
 digits {digit}+
-special [-{}!@#$%\^&*()+=_';:,./?~`\\|]
-hyperlink ({alpha}|{digit}|[/_:.])+
+special [-\[\]"{}!@#$%\^&*()+=_';:,./?~`\\|]
+hyperlink ({alpha}|{digit}|[-%&+=@#/_:.])+
+
 alphanumdot ({alpha}|{digit}|[.])
 alphanumspecial ({alpha}|{digit}|{special})
 
@@ -549,7 +550,7 @@ alphanumspecial ({alpha}|{digit}|{special})
 
 %%
 
-void yyerror(char *s) {
+void yyerror(const char *s) {
   fprintf(stderr, "%s\n", s);
 }
 
