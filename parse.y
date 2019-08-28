@@ -53,23 +53,10 @@
   char *str;
 }
 
-%type <str> TEXT
-%type <str> LINEBR
-%type <str> head
-%type <str> body
-%type <str> paragraph
-%type <str> body_content
-%type <str> title
-%type <str> doctype
-%type <str> h1
-%type <str> h2
-%type <str> h3
-%type <str> h4
-%type <str> header
+%type <str> TEXT LINEBR head body paragraph body_content title doctype h1 h2 h3 h4 header div
 %type <str> anchor BEFOREHYPERLINK HYPERLINK OANCHOR
 %type <str> ordlist unordlist list_item list_items
 %type <str> desclist termsdescs descterm descdesc terms descs
-%type <str> div
 %type <str> underline bold italic emphasis strong small sub sup
 %type <str> image src_width_height src width height OIMG CIMG OIMGSRC CIMGSRC OIMGWIDTH CIMGWIDTH OIMGHEIGHT CIMGHEIGHT WIDTH HEIGHT
 %type <str> table caption trs tr thstds th td

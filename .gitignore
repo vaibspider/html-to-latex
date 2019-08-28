@@ -1,0 +1,10 @@
+*.html
+*.swp
+*.output
+*.png
+*.jpg
+*.jpeg
+lex.yy.c
+*.tab.*
+parser
+problems
