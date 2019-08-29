@@ -9,3 +9,6 @@ lex.yy.c: tokenize.lex
 
 parse.tab.c: parse.y
 	@bison --debug -d -v -t parse.y
+
+clean:
+	@rm parser parse.tab.c parse.tab.h lex.yy.c parse.output

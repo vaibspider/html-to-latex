@@ -8,3 +8,6 @@ lex.yy.c
 *.tab.*
 parser
 problems
+a.out
+tree
+observations
