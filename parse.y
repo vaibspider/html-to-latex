@@ -66,7 +66,7 @@
 %type <str> sup_content sub_content small_content strong_content emphasis_content italic_content bold_content underline_content
 %type <str> td_content th_content caption_content1 caption_content2 figcaption_content figure_content
 %type <str> font font_content FONTSIZE center center_content teletype teletype_content
-%type <str> descterm_content descdesc_content
+%type <str> descterm_content descdesc_content flow_wo_anchor flow_wo_heading_table_anchor phrasing_content_wo_anchor
 
 %%
 
@@ -157,15 +157,23 @@ body_content:
 flow_content:
   header | flow_wo_heading_table | table
 
-flow_wo_heading_table:
-  phrasing_content | div | desclist | ordlist | 
-  paragraph | unordlist | figure 
-
 flow_wo_heading:
   table | flow_wo_heading_table
 
+flow_wo_heading_table:
+  flow_wo_heading_table_anchor | anchor
+
+flow_wo_anchor:
+  flow_wo_heading_table_anchor | header | table
+
+flow_wo_heading_table_anchor:
+  phrasing_content_wo_anchor | div | desclist | ordlist | paragraph | unordlist | figure
+
 phrasing_content:
-  TEXT | anchor | bold | emphasis | italic | image | 
+  phrasing_content_wo_anchor | anchor
+
+phrasing_content_wo_anchor:
+  TEXT | bold | emphasis | italic | image | 
   small | strong | sub | sup | underline | center |
   font | teletype |
   LINEBR {
@@ -852,14 +860,14 @@ anchor:
     strcat(anchor, "</a>");
     $$ = anchor;
   } |
-  JUSTOANCHOR TEXT CANCHOR {
+  JUSTOANCHOR flow_wo_anchor CANCHOR {
     char *anchor = (char *) malloc((strlen($2) + 8) * sizeof(char));
     strcpy(anchor, "<a>");
     strcat(anchor, $2);
     strcat(anchor, "</a>");
     $$ = anchor;
   } |
-  BEFOREHYPERLINK HYPERLINK OANCHOR TEXT CANCHOR {
+  BEFOREHYPERLINK HYPERLINK OANCHOR flow_wo_anchor CANCHOR {
     char *anchor = (char *) malloc((strlen($2) + strlen($4) + 16) * sizeof(char));
     strcpy(anchor, "<a href=\"");
     strcat(anchor, $2);
