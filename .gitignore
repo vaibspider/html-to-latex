@@ -11,3 +11,7 @@ problems
 a.out
 tree
 observations
+linked_list
+node
+*.o
+stack
