@@ -2,7 +2,7 @@
 all: parser
 
 parser: lex.yy.c parse.tab.c
-	@gcc lex.yy.c parse.tab.c -lfl -Wall -o parser
+	@gcc lex.yy.c parse.tab.c node.c linked_list.c stack.c lrtree.c -lfl -Wall -o parser
 
 lex.yy.c: tokenize.lex
 	@flex tokenize.lex
