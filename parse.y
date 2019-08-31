@@ -9,8 +9,6 @@
   void yyerror(const char *s);
   #define YYDEBUG 1
 
-  extern list *body_kids, *tt_kids, *center_kids, *font_kids, *figure_kids, *figcaption_kids, *table_kids, *caption_kids, *tr_kids, *th_kids, *td_kids, *underline_kids, *bold_kids, *italic_kids, *emphasis_kids, *strong_kids, *small_kids, *sub_kids, *sup_kids, *div_kids, *desclist_kids, *descterm_kids, *descdesc_kids, *ordlist_kids, *unordlist_kids, *listitem_kids, *anchor_kids, *h1_kids, *h2_kids, *h3_kids, *h4_kids, *paragraph_kids;
-  
   tree *t;
 %}
 
@@ -46,28 +44,32 @@
   float fp;
   char *str;
   struct node *n;
+  struct linked_list *l;
 }
+
+%type <l> flow_content_rec phrasing_content_rec
+%type <l> flow_wo_table_rec flow_wo_heading_rec flow_wo_anchor_rec
+%type <n> flow_wo_table 
 
 %type <n> html_page
 %type <str> TEXT LINEBR 
 %type <n> text
-%type <n> head body paragraph body_content title doctype h1 h2 h3 h4 header div
+%type <n> head body paragraph title doctype h1 h2 h3 h4 header div
 %type <n> anchor
 %type <str> BEFOREHYPERLINK HYPERLINK OANCHOR
-%type <n> ordlist unordlist list_item list_items_o list_items_u
-%type <n> desclist termsdescs descterm descdesc terms descs
+%type <n> ordlist unordlist list_item 
+%type <n> desclist descterm descdesc
+%type <l> termsdescs terms descs list_items
 %type <n> underline bold italic emphasis strong small sub sup
 %type <str> src_width_height src width height OIMG CIMG OIMGSRC CIMGSRC OIMGWIDTH CIMGWIDTH OIMGHEIGHT CIMGHEIGHT WIDTH HEIGHT
 %type <n> image
-%type <n> table caption trs tr thstds th td
+%type <n> table caption tr th td thortd
+%type <l> thstds trs 
 %type <n> flow_content phrasing_content flow_wo_heading flow_wo_heading_table
 %type <n> figure figcaption
-%type <n> paragraph_content h4_content h3_content h2_content h1_content list_item_content div_content
-%type <n> sup_content sub_content small_content strong_content emphasis_content italic_content bold_content underline_content
-%type <n> td_content th_content caption_content figcaption_content figure_content
-%type <n> font font_content center center_content teletype teletype_content
+%type <n> font center teletype
 %type <str> FONTSIZE
-%type <n> descterm_content descdesc_content flow_wo_anchor flow_wo_heading_table_anchor phrasing_content_wo_anchor anchor_content
+%type <n> flow_wo_anchor flow_wo_heading_table_anchor phrasing_content_wo_anchor
 
 %%
 
@@ -89,19 +91,19 @@ html_page:
   doctype OHTML CHTML {
     $$ = create_node(HTML_T);
     add_root(t, $$);
-    /* ignore doctype */
+    $$->lchild = $1;
   } |
   doctype OHTML head CHTML {
     $$ = create_node(HTML_T);
     add_root(t, $$);
-    $$->lchild = $3;
-    /* ignore doctype */
+    $$->lchild = $1;
+    $1->rsibling = $3;
   } |
   doctype OHTML body CHTML {
     $$ = create_node(HTML_T);
     add_root(t, $$);
-    $$->lchild = $3;
-    /* ignore doctype */
+    $$->lchild = $1;
+    $1->rsibling = $3;
   } |
   OHTML head body CHTML {
     $$ = create_node(HTML_T);
@@ -112,15 +114,18 @@ html_page:
   doctype OHTML head body CHTML	{ 
     $$ = create_node(HTML_T);
     add_root(t, $$);
-    $$->lchild = $3;
+    $$->lchild = $1;
+    $1->rsibling = $3;
     $3->rsibling = $4;
-    /* ignore doctype */
   }
 
 doctype:
   ODOCTYPE CANGBRKT {
+    $$ = create_node(DOCTYPE_T);
   } |
   ODOCTYPE text CANGBRKT {
+    $$ = create_node(DOCTYPE_T);
+    $$->lchild = $2;
   }
 
 head:
@@ -145,21 +150,66 @@ body:
   OBODY CBODY {
     $$ = create_node(BODY_T);
   } |
-  OBODY body_content CBODY {
+  OBODY flow_content_rec CBODY {
     $$ = create_node(BODY_T);
-    take_kids(BODY_T, $$);
+    $$->lchild = $2->head;
   }
 
-body_content:
+flow_content_rec:
   flow_content {
-    add_a_kid($1, BODY_T);
+    $$ = init_list();
+    list_append($$, $1);
   } |
-  body_content flow_content {
-    add_a_kid($2, BODY_T);
+  flow_content_rec flow_content {
+    list_append($1, $2);
+    $$ = $1;
+  }
+
+phrasing_content_rec:
+  phrasing_content {
+    $$ = init_list();
+    list_append($$, $1);
+  } |
+  phrasing_content_rec phrasing_content {
+    list_append($1, $2);
+    $$ = $1;
+  }
+
+flow_wo_table_rec:
+  flow_wo_table {
+    $$ = init_list();
+    list_append($$, $1);
+  } |
+  flow_wo_table_rec flow_wo_table {
+    list_append($1, $2);
+    $$ = $1;
+  }
+
+flow_wo_heading_rec:
+  flow_wo_heading {
+    $$ = init_list();
+    list_append($$, $1);
+  } |
+  flow_wo_heading_rec flow_wo_heading {
+    list_append($1, $2);
+    $$ = $1;
+  }
+
+flow_wo_anchor_rec:
+  flow_wo_anchor {
+    $$ = init_list();
+    list_append($$, $1);
+  } |
+  flow_wo_anchor_rec flow_wo_anchor {
+    list_append($1, $2);
+    $$ = $1;
   }
 
 flow_content:
   header | flow_wo_heading_table | table
+
+flow_wo_table:
+  flow_wo_heading_table | header
 
 flow_wo_heading:
   table | flow_wo_heading_table
@@ -189,121 +239,74 @@ text:
   }
 
 teletype:
-  OTELETYPE teletype_content CTELETYPE {
+  OTELETYPE phrasing_content_rec CTELETYPE {
     $$ = create_node(TELETYPE_T);
-    take_kids(TELETYPE_T, $$);
-  }
-
-teletype_content:
-  phrasing_content {
-    add_a_kid($1, TELETYPE_T);
-  } |
-  teletype_content phrasing_content {
-    add_a_kid($2, TELETYPE_T);
+    $$->lchild = $2->head;
   }
 
 center:
-  OCENTER center_content CCENTER {
+  OCENTER flow_content_rec CCENTER {
     $$ = create_node(CENTER_T);
-    take_kids(CENTER_T, $$);
-  }
-
-center_content:
-  flow_content {
-    add_a_kid($1, CENTER_T);
-  } |
-  center_content flow_content {
-    add_a_kid($2, CENTER_T);
+    $$->lchild = $2->head;
   }
 
 font:
-  BEFORESIZE FONTSIZE OFONT font_content CFONT {
+  BEFORESIZE FONTSIZE OFONT phrasing_content_rec CFONT {
     $$ = create_node(FONT_T);
     $$->attributes=(char *)malloc(strlen($2) + strlen("size=") + 1);
     strcpy($$->attributes, "size=");
     strcat($$->attributes, $2);
-    take_kids(FONT_T, $$);
-  }
-
-font_content:
-  phrasing_content {
-    add_a_kid($1, FONT_T);
-  } |
-  font_content phrasing_content {
-    add_a_kid($2, FONT_T);
+    $$->lchild = $4->head;
   }
 
 figure:
-  OFIGURE figcaption figure_content CFIGURE {
+  OFIGURE figcaption flow_content_rec CFIGURE {
     $$ = create_node(FIGURE_T);
-    take_kids(FIGURE_T, $$);
+    $2->rsibling = $3->head;
+    $$->lchild = $2;
   } |
-  OFIGURE figure_content figcaption CFIGURE {
+  OFIGURE flow_content_rec figcaption CFIGURE {
     $$ = create_node(FIGURE_T);
-    take_kids(FIGURE_T, $$);
+    list_append($2, $3);
+    $$->lchild = $2->head;
   } |
-  OFIGURE figure_content CFIGURE {
+  OFIGURE flow_content_rec CFIGURE {
     $$ = create_node(FIGURE_T);
-    take_kids(FIGURE_T, $$);
-  }
-
-figure_content:
-  flow_content {
-    add_a_kid($1, FIGURE_T);
-  } |
-  figure_content flow_content {
-    add_a_kid($2, FIGURE_T);
+    $$->lchild = $2->head;
   }
 
 figcaption:
-  OFIGCAPTION figcaption_content CFIGCAPTION {
+  OFIGCAPTION flow_content_rec CFIGCAPTION {
     $$ = create_node(FIGCAPTION_T);
-    take_kids(FIGCAPTION_T, $$);
-    add_a_kid($2, FIGURE_T);
-  }
-
-figcaption_content:
-  flow_content {
-    add_a_kid($1, FIGCAPTION_T);
-  } |
-  figcaption_content flow_content {
-    add_a_kid($2, FIGCAPTION_T);
+    $$->lchild = $2->head;
   }
 
 table:
   OTABLE trs CTABLE {
     $$ = create_node(TABLE_T);
-    take_kids(TABLE_T, $$);
+    $$->lchild = $2->head;
   } |
   OTABLE caption trs CTABLE {
     $$ = create_node(TABLE_T);
-    take_kids(TABLE_T, $$);
+    $2->rsibling = $3->head;
+    $$->lchild = $2;
   }
 
 /* caption contents 1 and 2 are combined into one */
 caption: 
-  OCAPTION caption_content CCAPTION {
+  OCAPTION flow_wo_table_rec CCAPTION {
     $$ = create_node(CAPTION_T);
-    take_kids(CAPTION_T, $$);
-    add_a_kid($2, TABLE_T);
-  }
-
-caption_content:
-  header {add_a_kid($1, CAPTION_T);} |
-  flow_wo_heading_table {add_a_kid($1, CAPTION_T);} |
-  caption_content header {
-    add_a_kid($2, CAPTION_T);
-  } |
-  caption_content flow_wo_heading_table {
-    add_a_kid($2, CAPTION_T);
+    $$->lchild = $2->head;
   }
 
 trs:
   tr {
-    add_a_kid($1, TABLE_T);
+    $$ = init_list();
+    list_append($$, $1);
   } |
   trs tr {
-    add_a_kid($2, TABLE_T);
+    list_append($1, $2);
+    $$ = $1;
   }
 
 tr:
@@ -312,49 +315,32 @@ tr:
   } |
   OTROW thstds CTROW {
     $$ = create_node(TR_T);
-    take_kids(TR_T, $$);
+    $$->lchild = $2->head;
   }
 
 thstds:
-  th {
-    add_a_kid($1, TR_T);
+  thortd {
+    $$ = init_list();
+    list_append($$, $1);
   } | 
-  td {
-    add_a_kid($1, TR_T);
-  } |
-  thstds th {
-    add_a_kid($2, TR_T);
-  } |
-  thstds td {
-    add_a_kid($2, TR_T);
+  thstds thortd {
+    list_append($1, $2);
+    $$ = $1;
   }
+
+thortd:
+  th | td
 
 th:
-  OTHEAD th_content CTHEAD {
+  OTHEAD flow_wo_heading_rec CTHEAD {
     $$ = create_node(TH_T);
-    take_kids(TH_T, $$);
-  }
-
-th_content:
-  flow_wo_heading {
-    add_a_kid($1, TH_T);
-  } |
-  th_content flow_wo_heading {
-    add_a_kid($2, TH_T);
+    $$->lchild = $2->head;
   }
 
 td:
-  OTCOL td_content CTCOL {
+  OTCOL flow_content_rec CTCOL {
     $$ = create_node(TD_T);
-    take_kids(TD_T, $$);
-  }
-
-td_content:
-  flow_content {
-    add_a_kid($1, TD_T);
-  } |
-  td_content flow_content {
-    add_a_kid($2, TD_T);
+    $$->lchild = $2->head;
   }
 
 image:
@@ -462,129 +448,57 @@ height:
   }
 
 underline:
-  OUNDERLINE underline_content CUNDERLINE {
+  OUNDERLINE phrasing_content_rec CUNDERLINE {
     $$ = create_node(UNDERLINE_T);
-    take_kids(UNDERLINE_T, $$);
-  }
-
-underline_content:
-  phrasing_content {
-    add_a_kid($1, UNDERLINE_T);
-  } |
-  underline_content phrasing_content {
-    add_a_kid($2, UNDERLINE_T);
+    $$->lchild = $2->head;
   }
 
 bold:
-  OBOLD bold_content CBOLD {
+  OBOLD phrasing_content_rec CBOLD {
     $$ = create_node(BOLD_T);
-    take_kids(BOLD_T, $$);
-  }
-
-bold_content:
-  phrasing_content {
-    add_a_kid($1, BOLD_T);
-  } |
-  bold_content phrasing_content {
-    add_a_kid($2, BOLD_T);
+    $$->lchild = $2->head;
   }
 
 italic:
-  OITALIC italic_content CITALIC {
+  OITALIC phrasing_content_rec CITALIC {
     $$ = create_node(ITALIC_T);
-    take_kids(ITALIC_T, $$);
-  }
-
-italic_content:
-  phrasing_content {
-    add_a_kid($1, ITALIC_T);
-  } |
-  italic_content phrasing_content {
-    add_a_kid($2, ITALIC_T);
+    $$->lchild = $2->head;
   }
 
 emphasis:
-  OEMPHASIS emphasis_content CEMPHASIS {
+  OEMPHASIS phrasing_content_rec CEMPHASIS {
     $$ = create_node(EMPHASIS_T);
-    take_kids(EMPHASIS_T, $$);
-  }
-
-emphasis_content:
-  phrasing_content {
-    add_a_kid($1, EMPHASIS_T);
-  } |
-  emphasis_content phrasing_content {
-    add_a_kid($2, EMPHASIS_T);
+    $$->lchild = $2->head;
   }
 
 strong:
-  OSTRONG strong_content CSTRONG {
+  OSTRONG phrasing_content_rec CSTRONG {
     $$ = create_node(STRONG_T);
-    take_kids(STRONG_T, $$);
-  }
-
-strong_content:
-  phrasing_content {
-    add_a_kid($1, STRONG_T);
-  } |
-  strong_content phrasing_content {
-    add_a_kid($2, STRONG_T);
+    $$->lchild = $2->head;
   }
 
 small:
-  OSMALL small_content CSMALL {
+  OSMALL phrasing_content_rec CSMALL {
     $$ = create_node(SMALL_T);
-    take_kids(SMALL_T, $$);
-  }
-
-small_content:
-  phrasing_content {
-    add_a_kid($1, SMALL_T);
-  } |
-  small_content phrasing_content {
-    add_a_kid($2, SMALL_T);
+    $$->lchild = $2->head;
   }
 
 sub:
-  OSUB sub_content CSUB {
+  OSUB phrasing_content_rec CSUB {
     $$ = create_node(SUB_T);
-    take_kids(SUB_T, $$);
-  }
-
-sub_content:
-  phrasing_content {
-    add_a_kid($1, SUB_T);
-  } |
-  sub_content phrasing_content {
-    add_a_kid($2, SUB_T);
+    $$->lchild = $2->head;
   }
 
 sup:
-  OSUP sup_content CSUP {
+  OSUP phrasing_content_rec CSUP {
     $$ = create_node(SUP_T);
-    take_kids(SUP_T, $$);
-  }
-
-sup_content:
-  phrasing_content {
-    add_a_kid($1, SUP_T);
-  } |
-  sup_content phrasing_content {
-    add_a_kid($2, SUP_T);
+    $$->lchild = $2->head;
   }
 
 div:
-  ODIV div_content CDIV {
+  ODIV flow_content_rec CDIV {
     $$ = create_node(DIV_T);
-    take_kids(DIV_T, $$);
-  }
-
-div_content:
-  flow_content {
-    add_a_kid($1, DIV_T);
-  } |
-  div_content flow_content {
-    add_a_kid($2, DIV_T);
+    $$->lchild = $2->head;
   }
 
 desclist:
@@ -593,105 +507,85 @@ desclist:
   } |
   ODESCLIST termsdescs CDESCLIST {
     $$ = create_node(DESCLIST_T);
-    take_kids(DESCLIST_T, $$);
+    $$->lchild = $2->head;
   }
 
 termsdescs:
   terms descs {
+    $$ = init_list();
+    list_append($$, $1->head);
+    list_append($$, $2->head);
   } |
   termsdescs terms descs {
+    list_append($1, $2->head);
+    list_append($1, $3->head);
+    $$ = $1;
   }
 
 terms:
   descterm {
-    add_a_kid($1, DESCLIST_T);
+    $$ = init_list();
+    list_append($$, $1);
   } |
   terms descterm {
-    add_a_kid($2, DESCLIST_T);
+    list_append($1, $2);
+    $$ = $1;
   }
 
 descs:
   descdesc {
-    add_a_kid($1, DESCLIST_T);
+    $$ = init_list();
+    list_append($$, $1);
   } |
   descs descdesc {
-    add_a_kid($2, DESCLIST_T);
+    list_append($1, $2);
+    $$ = $1;
   }
 
 descterm:
-  ODESCTERM descterm_content CDESCTERM {
+  ODESCTERM flow_wo_heading_rec CDESCTERM {
     $$ = create_node(DESCTERM_T);
-    take_kids(DESCTERM_T, $$);
-  }
-
-descterm_content:
-  flow_wo_heading {
-    add_a_kid($1, DESCTERM_T);
-  } |
-  descterm_content flow_wo_heading {
-    add_a_kid($2, DESCTERM_T);
+    $$->lchild = $2->head;
   }
 
 descdesc:
-  ODESCDESC descdesc_content CDESCDESC {
+  ODESCDESC flow_content_rec CDESCDESC {
     $$ = create_node(DESCDESC_T);
-    take_kids(DESCDESC_T, $$);
-  }
-
-descdesc_content:
-  flow_content {
-    add_a_kid($1, DESCDESC_T);
-  } |
-  descdesc_content flow_content {
-    add_a_kid($2, DESCDESC_T);
+    $$->lchild = $2->head;
   }
 
 ordlist:
   OORDERLIST CORDERLIST {
     $$ = create_node(ORDLIST_T);
   } |
-  OORDERLIST list_items_o CORDERLIST {
+  OORDERLIST list_items CORDERLIST {
     $$ = create_node(ORDLIST_T);
-    take_kids(ORDLIST_T, $$);
+    $$->lchild = $2->head;
   }
 
 unordlist:
   OUNORDERLIST CUNORDERLIST {
     $$ = create_node(UNORDLIST_T);
   } |
-  OUNORDERLIST list_items_u CUNORDERLIST {
+  OUNORDERLIST list_items CUNORDERLIST {
     $$ = create_node(UNORDLIST_T);
-    take_kids(UNORDLIST_T, $$);
+    $$->lchild = $2->head;
   }
 
-list_items_o:
+list_items:
   list_item {
-    add_a_kid($1, ORDLIST_T);
+    $$ = init_list();
+    list_append($$, $1);
   } |
-  list_items_o list_item {
-    add_a_kid($2, ORDLIST_T);
-  }
-
-list_items_u:
-  list_item {
-    add_a_kid($1, UNORDLIST_T);
-  } |
-  list_items_u list_item {
-    add_a_kid($2, UNORDLIST_T);
+  list_items list_item {
+    list_append($1, $2);
+    $$ = $1;
   }
 
 list_item:
-  OLISTITEM list_item_content CLISTITEM {
+  OLISTITEM flow_content_rec CLISTITEM {
     $$ = create_node(LISTITEM_T);
-    take_kids(LISTITEM_T, $$);
-  }
-
-list_item_content:
-  flow_content {
-    add_a_kid($1, LISTITEM_T);
-  } |
-  list_item_content flow_content {
-    add_a_kid($2, LISTITEM_T);
+    $$->lchild = $2->head;
   }
 
 anchor:
@@ -704,107 +598,55 @@ anchor:
     strcpy($$->attributes, "href=");
     strcat($$->attributes, $2);
   } |
-  JUSTOANCHOR anchor_content CANCHOR {
+  JUSTOANCHOR flow_wo_anchor_rec CANCHOR {
     $$ = create_node(ANCHOR_T);
-    take_kids(ANCHOR_T, $$);
+    $$->lchild = $2->head;
   } |
-  BEFOREHYPERLINK HYPERLINK OANCHOR anchor_content CANCHOR {
+  BEFOREHYPERLINK HYPERLINK OANCHOR flow_wo_anchor_rec CANCHOR {
     $$ = create_node(ANCHOR_T);
     $$->attributes = (char *)malloc(strlen($2) + strlen("href=") + 1);
     strcpy($$->attributes, "href=");
     strcat($$->attributes, $2);
-    take_kids(ANCHOR_T, $$);
-  }
-
-anchor_content:
-  flow_wo_anchor {
-    add_a_kid($1, ANCHOR_T);
-  } |
-  anchor_content flow_wo_anchor {
-    add_a_kid($2, ANCHOR_T);
+    $$->lchild = $4->head;
   }
 
 header:
   h1 | h2 | h3 | h4;
 
 h1:
-  OHEADONE h1_content CHEADONE {
+  OHEADONE phrasing_content_rec CHEADONE {
     $$ = create_node(H1_T);
-    take_kids(H1_T, $$);
-  }
-
-h1_content:
-  phrasing_content {
-    add_a_kid($1, H1_T);
-  } |
-  h1_content phrasing_content {
-    add_a_kid($2, H1_T);
+    $$->lchild = $2->head;
   }
 
 h2:
-  OHEADTWO h2_content CHEADTWO {
+  OHEADTWO phrasing_content_rec CHEADTWO {
     $$ = create_node(H2_T);
-    take_kids(H2_T, $$);
-  }
-
-h2_content:
-  phrasing_content {
-    add_a_kid($1, H2_T);
-  } |
-  h2_content phrasing_content {
-    add_a_kid($2, H2_T);
+    $$->lchild = $2->head;
   }
 
 h3:
-  OHEADTHREE h3_content CHEADTHREE {
+  OHEADTHREE phrasing_content_rec CHEADTHREE {
     $$ = create_node(H3_T);
-    take_kids(H3_T, $$);
-  }
-
-h3_content:
-  phrasing_content {
-    add_a_kid($1, H3_T);
-  } |
-  h3_content phrasing_content {
-    add_a_kid($2, H3_T);
+    $$->lchild = $2->head;
   }
 
 h4:
-  OHEADFOUR h4_content CHEADFOUR {
+  OHEADFOUR phrasing_content_rec CHEADFOUR {
     $$ = create_node(H4_T);
-    take_kids(H4_T, $$);
-  }
-
-h4_content:
-  phrasing_content {
-    add_a_kid($1, H4_T);
-  } |
-  h4_content phrasing_content {
-    add_a_kid($2, H4_T);
+    $$->lchild = $2->head;
   }
 
 paragraph:
-  OPARA paragraph_content CPARA {
+  OPARA phrasing_content_rec CPARA {
     $$ = create_node(PARAGRAPH_T);
-    //print_list(paragraph_kids);
-    take_kids(PARAGRAPH_T, $$);
-    //print($$);
-    //print_list(paragraph_kids);
-  }
-
-paragraph_content:
-  phrasing_content {
-    add_a_kid($1, PARAGRAPH_T);
-  } |
-  paragraph_content phrasing_content {
-    add_a_kid($2, PARAGRAPH_T);
+    $$->lchild = $2->head;
   }
 
 %%
 
 int main(int argc, char **argv) {
     t = init_tree();
-    init_kids(-1);
     yyparse();
     print_tree(t);
     return 0;
