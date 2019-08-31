@@ -5,11 +5,13 @@
   #include "linked_list.h"
   #include "stack.h"
   #include "lrtree.h"
+  #include "tree_converter.h"
   int yylex(void);
   void yyerror(const char *s);
   #define YYDEBUG 1
 
-  tree *t;
+  tree *html_tree;
+  tree *latex_tree;
 %}
 
 /*%define lr.type canonical-lr*/
@@ -76,44 +78,45 @@
 html_page:
   OHTML CHTML {
     $$ = create_node(HTML_T);
-    add_root(t, $$);
+    $$->data = NULL;
+    add_root(html_tree, $$);
   } |
   OHTML body CHTML {
     $$ = create_node(HTML_T);
-    add_root(t, $$);
+    add_root(html_tree, $$);
     $$->lchild = $2;
   } |
   OHTML head CHTML {
     $$ = create_node(HTML_T);
-    add_root(t, $$);
+    add_root(html_tree, $$);
     $$->lchild = $2;
   } |
   doctype OHTML CHTML {
     $$ = create_node(HTML_T);
-    add_root(t, $$);
+    add_root(html_tree, $$);
     $$->lchild = $1;
   } |
   doctype OHTML head CHTML {
     $$ = create_node(HTML_T);
-    add_root(t, $$);
+    add_root(html_tree, $$);
     $$->lchild = $1;
     $1->rsibling = $3;
   } |
   doctype OHTML body CHTML {
     $$ = create_node(HTML_T);
-    add_root(t, $$);
+    add_root(html_tree, $$);
     $$->lchild = $1;
     $1->rsibling = $3;
   } |
   OHTML head body CHTML {
     $$ = create_node(HTML_T);
-    add_root(t, $$);
+    add_root(html_tree, $$);
     $$->lchild = $2;
     $2->rsibling = $3;
   } |
   doctype OHTML head body CHTML	{ 
     $$ = create_node(HTML_T);
-    add_root(t, $$);
+    add_root(html_tree, $$);
     $$->lchild = $1;
     $1->rsibling = $3;
     $3->rsibling = $4;
@@ -292,7 +295,6 @@ table:
     $$->lchild = $2;
   }
 
-/* caption contents 1 and 2 are combined into one */
 caption: 
   OCAPTION flow_wo_table_rec CCAPTION {
     $$ = create_node(CAPTION_T);
@@ -646,8 +648,13 @@ paragraph:
 %%
 
 int main(int argc, char **argv) {
-    t = init_tree();
+    html_tree = init_tree();
+    latex_tree = init_tree();
     yyparse();
-    print_tree(t);
+    printf("================================================HTML TREE=====================================================\n");
+    print_tree(html_tree);
+    printf("================================================LATEX TREE=====================================================\n");
+    latex_tree = convert(html_tree);
+    print_tree(latex_tree);
     return 0;
 }

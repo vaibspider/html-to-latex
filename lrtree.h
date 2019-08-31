@@ -16,5 +16,6 @@ void add_a_kid(node *, tag parent_type);
 void init_kids(tag type);
 void take_kids(tag type, node *);
 void print(node *n);
+char *get_tag_type(tag);
 
 #endif

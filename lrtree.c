@@ -8,403 +8,17 @@
 
 void print(node *n);
 
-list *body_kids, *tt_kids, *center_kids, *font_kids, *figure_kids, *figcaption_kids, *table_kids, *caption_kids, *tr_kids, *th_kids,\
-     *td_kids, *underline_kids, *bold_kids, *italic_kids, *emphasis_kids, *strong_kids, *small_kids, *sub_kids, *sup_kids, *div_kids,\
-     *desclist_kids, *descterm_kids, *descdesc_kids, *ordlist_kids, *unordlist_kids, *listitem_kids, *anchor_kids, *h1_kids, *h2_kids,\
-     *h3_kids, *h4_kids, *paragraph_kids;
-
-void add_a_kid(node *n, tag parent_type) {
-  switch(parent_type) {
-    case BODY_T:
-      list_append(body_kids, n);
-      break;
-    case TELETYPE_T:
-      list_append(tt_kids, n);
-      break;
-    case CENTER_T:
-      list_append(center_kids, n);
-      break;
-    case FONT_T:
-      list_append(font_kids, n);
-      break;
-    case FIGURE_T:
-      list_append(figure_kids, n);
-      break;
-    case FIGCAPTION_T:
-      list_append(figcaption_kids, n);
-      break;
-    case TABLE_T:
-      list_append(table_kids, n);
-      break;
-    case CAPTION_T:
-      list_append(caption_kids, n);
-      break;
-    case TR_T:
-      list_append(tr_kids, n);
-      break;
-    case TH_T:
-      list_append(th_kids, n);
-      break;
-    case TD_T:
-      list_append(td_kids, n);
-      break;
-    case UNDERLINE_T:
-      list_append(underline_kids, n);
-      break;
-    case BOLD_T:
-      list_append(bold_kids, n);
-      break;
-    case ITALIC_T:
-      list_append(italic_kids, n);
-      break;
-    case EMPHASIS_T:
-      list_append(emphasis_kids, n);
-      break;
-    case STRONG_T:
-      list_append(strong_kids, n);
-      break;
-    case SMALL_T:
-      list_append(small_kids, n);
-      break;
-    case SUB_T:
-      list_append(sub_kids, n);
-      break;
-    case SUP_T:
-      list_append(sup_kids, n);
-      break;
-    case DIV_T:
-      list_append(div_kids, n);
-      break;
-    case DESCLIST_T:
-      list_append(desclist_kids, n);
-      break;
-    case DESCTERM_T:
-      list_append(descterm_kids, n);
-      break;
-    case DESCDESC_T:
-      list_append(descdesc_kids, n);
-      break;
-    case ORDLIST_T:
-      list_append(ordlist_kids, n);
-      break;
-    case UNORDLIST_T:
-      list_append(unordlist_kids, n);
-      break;
-    case LISTITEM_T:
-      list_append(listitem_kids, n);
-      break;
-    case ANCHOR_T:
-      list_append(anchor_kids, n);
-      break;
-    case H1_T:
-      list_append(h1_kids, n);
-      break;
-    case H2_T:
-      list_append(h2_kids, n);
-      break;
-    case H3_T:
-      list_append(h3_kids, n);
-      break;
-    case H4_T:
-      list_append(h4_kids, n);
-      break;
-    case PARAGRAPH_T:
-      list_append(paragraph_kids, n);
-      break;
-    default:
-      break;
-  }
-}
-
-void init_kids(tag type) {
-  switch(type) {
-    case BODY_T:
-      body_kids = init_list();
-      break;
-    case TELETYPE_T:
-      tt_kids = init_list();
-      break;
-    case CENTER_T:
-      center_kids = init_list();
-      break;
-    case FONT_T:
-      font_kids = init_list();
-      break;
-    case FIGURE_T:
-      figure_kids = init_list();
-      break;
-    case FIGCAPTION_T:
-      figcaption_kids = init_list();
-      break;
-    case TABLE_T:
-      table_kids = init_list();
-      break;
-    case CAPTION_T:
-      caption_kids = init_list();
-      break;
-    case TR_T:
-      tr_kids = init_list();
-      break;
-    case TH_T:
-      th_kids = init_list();
-      break;
-    case TD_T:
-      td_kids = init_list();
-      break;
-    case UNDERLINE_T:
-      underline_kids = init_list();
-      break;
-    case BOLD_T:
-      bold_kids = init_list();
-      break;
-    case ITALIC_T:
-      italic_kids = init_list();
-      break;
-    case EMPHASIS_T:
-      emphasis_kids = init_list();
-      break;
-    case STRONG_T:
-      strong_kids = init_list();
-      break;
-    case SMALL_T:
-      small_kids = init_list();
-      break;
-    case SUB_T:
-      sub_kids = init_list();
-      break;
-    case SUP_T:
-      sup_kids = init_list();
-      break;
-    case DIV_T:
-      div_kids = init_list();
-      break;
-    case DESCLIST_T:
-      desclist_kids = init_list();
-      break;
-    case DESCTERM_T:
-      descterm_kids = init_list();
-      break;
-    case DESCDESC_T:
-      descdesc_kids = init_list();
-      break;
-    case ORDLIST_T:
-      ordlist_kids = init_list();
-      break;
-    case UNORDLIST_T:
-      unordlist_kids = init_list();
-      break;
-    case LISTITEM_T:
-      listitem_kids = init_list();
-      break;
-    case ANCHOR_T:
-      anchor_kids = init_list();
-      break;
-    case H1_T:
-      h1_kids = init_list();
-      break;
-    case H2_T:
-      h2_kids = init_list();
-      break;
-    case H3_T:
-      h3_kids = init_list();
-      break;
-    case H4_T:
-      h4_kids = init_list();
-      break;
-    case PARAGRAPH_T:
-      paragraph_kids = init_list();
-      break;
-    default:
-      body_kids = init_list();
-      tt_kids = init_list();
-      center_kids = init_list();
-      font_kids = init_list();
-      figure_kids = init_list();
-      figcaption_kids = init_list();
-      table_kids = init_list();
-      caption_kids = init_list();
-      tr_kids = init_list();
-      th_kids = init_list();
-      td_kids = init_list();
-      underline_kids = init_list();
-      bold_kids = init_list();
-      italic_kids = init_list();
-      emphasis_kids = init_list();
-      strong_kids = init_list();
-      small_kids = init_list();
-      sub_kids = init_list();
-      sup_kids = init_list();
-      div_kids = init_list();
-      desclist_kids = init_list();
-      descterm_kids = init_list();
-      descdesc_kids = init_list();
-      ordlist_kids = init_list();
-      unordlist_kids = init_list();
-      listitem_kids = init_list();
-      anchor_kids = init_list();
-      h1_kids = init_list();
-      h2_kids = init_list();
-      h3_kids = init_list();
-      h4_kids = init_list();
-      paragraph_kids = init_list();
-      break;
-  }
-}
-
-void take_kids(tag type, node *n) {
-  switch(type) {
-    case BODY_T:
-      n->lchild = body_kids->head;
-      break;
-    case TELETYPE_T:
-      n->lchild = tt_kids->head;
-      init_kids(TELETYPE_T);
-      break;
-    case CENTER_T:
-      n->lchild = center_kids->head;
-      init_kids(CENTER_T);
-      break;
-    case FONT_T:
-      n->lchild = font_kids->head;
-      init_kids(FONT_T);
-      break;
-    case FIGURE_T:
-      n->lchild = figure_kids->head;
-      init_kids(FIGURE_T);
-      break;
-    case FIGCAPTION_T:
-      n->lchild = figcaption_kids->head;
-      init_kids(FIGCAPTION_T);
-      break;
-    case TABLE_T:
-      n->lchild = table_kids->head;
-      init_kids(TABLE_T);
-      break;
-    case CAPTION_T:
-      n->lchild = caption_kids->head;
-      init_kids(CAPTION_T);
-      break;
-    case TR_T:
-      n->lchild = tr_kids->head;
-      init_kids(TR_T);
-      break;
-    case TH_T:
-      n->lchild = th_kids->head;
-      init_kids(TH_T);
-      break;
-    case TD_T:
-      n->lchild = td_kids->head;
-      init_kids(TD_T);
-      break;
-    case UNDERLINE_T:
-      n->lchild = underline_kids->head;
-      init_kids(UNDERLINE_T);
-      break;
-    case BOLD_T:
-      n->lchild = bold_kids->head;
-      init_kids(BOLD_T);
-      break;
-    case ITALIC_T:
-      n->lchild = italic_kids->head;
-      init_kids(ITALIC_T);
-      break;
-    case EMPHASIS_T:
-      n->lchild = emphasis_kids->head;
-      init_kids(EMPHASIS_T);
-      break;
-    case STRONG_T:
-      n->lchild = strong_kids->head;
-      init_kids(STRONG_T);
-      break;
-    case SMALL_T:
-      n->lchild = small_kids->head;
-      init_kids(SMALL_T);
-      break;
-    case SUB_T:
-      n->lchild = sub_kids->head;
-      init_kids(SUB_T);
-      break;
-    case SUP_T:
-      n->lchild = sup_kids->head;
-      init_kids(SUP_T);
-      break;
-    case DIV_T:
-      n->lchild = div_kids->head;
-      init_kids(DIV_T);
-      break;
-    case DESCLIST_T:
-      n->lchild = desclist_kids->head;
-      init_kids(DESCLIST_T);
-      break;
-    case DESCTERM_T:
-      n->lchild = descterm_kids->head;
-      init_kids(DESCTERM_T);
-      break;
-    case DESCDESC_T:
-      n->lchild = descdesc_kids->head;
-      init_kids(DESCDESC_T);
-      break;
-    case ORDLIST_T:
-      n->lchild = ordlist_kids->head;
-      init_kids(ORDLIST_T);
-      break;
-    case UNORDLIST_T:
-      n->lchild = unordlist_kids->head;
-      init_kids(UNORDLIST_T);
-      break;
-    case LISTITEM_T:
-      n->lchild = listitem_kids->head;
-      init_kids(LISTITEM_T);
-      break;
-    case ANCHOR_T:
-      n->lchild = anchor_kids->head;
-      init_kids(ANCHOR_T);
-      break;
-    case H1_T:
-      n->lchild = h1_kids->head;
-      init_kids(H1_T);
-      break;
-    case H2_T:
-      n->lchild = h2_kids->head;
-      init_kids(H2_T);
-      break;
-    case H3_T:
-      n->lchild = h3_kids->head;
-      init_kids(H3_T);
-      break;
-    case H4_T:
-      n->lchild = h4_kids->head;
-      init_kids(H4_T);
-      break;
-    case PARAGRAPH_T:
-      n->lchild = paragraph_kids->head;
-      init_kids(PARAGRAPH_T);
-      break;
-    default:
-      break;
-  }
-}
-
-node *new_node(char *data, tag type) {
-  node *new = (node *)malloc(sizeof(node));
-  if(new == NULL) {
-    perror("Unable to allocate memory!\n");
-  }
-  new->type = type;
-  if ((new->data = data)) {
-    new->data = strdup(data); /* check if we really need strdup() */
-  }
-  new->parent = new->lchild = new->rsibling = NULL;
-  return new;
-}
-
 tree *init_tree() {
   tree *t = (tree *)malloc(sizeof(tree));
+  if (t == NULL) {
+    perror("Unable to allocate memory!\n");
+    exit(1);
+  }
   t->root = NULL;
   return t;
 }
 
-tree *add_node(tree *t, node *n, node *parent) { /* no need of tree t */
+tree *add_node(tree *t, node *n, node *parent) {
   node *p = parent->lchild;
   if (p == NULL) {
     parent->lchild = n;
@@ -447,8 +61,89 @@ node *traverse(node *n, tag type) {
   }
 }
 
+/* a helper function used to print a tree */
 char *get_tag_type(tag type) {
   switch(type) {
+    case NEWLINE_T:
+      return "NEWLINE_T";
+    case CONTENT_T:
+      return "CONTENT_T";
+    case LATEX_T:
+      return "LATEX_T";
+    case DOC_CLASS_T:
+      return "DOC_CLASS_T";
+    case PREAMBLE_T:
+      return "PREAMBLE_T";
+    case DOCUMENT_T:
+      return "DOCUMENT_T";
+    case LTITLE_T:
+      return "LTITLE_T";
+    case HREF_T:
+      return "HREF_T";
+    case FONTVAR_T:
+      return "FONTVAR_T";
+    case CENTERING_T:
+      return "CENTERING_T";
+    case PARA_T:
+      return "PARA_T";
+    case LH1_T:
+      return "LH1_T";
+    case LH2_T:
+      return "LH2_T";
+    case LH3_T:
+      return "LH3_T";
+    case LH4_T:
+      return "LH4_T";
+    case LUNORDLIST_T:
+      return "LUNORDLIST_T";
+    case LORDLIST_T:
+      return "LORDLIST_T";
+    case LDESCLIST_T:
+      return "LDESCLIST_T";
+    case LDESCTERM_T:
+      return "LDESCTERM_T";
+    case LDESCDESC_T:
+      return "LDESCDESC_T";
+    case LDIV_T:
+      return "LDIV_T";
+    case LITEM_T:
+      return "LITEM_T";
+    case LUNDERLINE_T:
+      return "LUNDERLINE_T";
+    case LBOLD_T:
+      return "LBOLD_T";
+    case LITALIC_T:
+      return "LITALIC_T";
+    case LEMPHASIS_T:
+      return "LEMPHASIS_T";
+    case LTELETYPE_T:
+      return "LTELETYPE_T";
+    case LSMALL_T:
+      return "LSMALL_T";
+    case HSPACE_T:
+      return "HSPACE_T";
+    case LSUB_T:
+      return "LSUB_T";
+    case LSUP_T:
+      return "LSUP_T";
+    case LIMAGE_T:
+      return "LIMAGE_T";
+    case LFIGURE_T:
+      return "LFIGURE_T";
+    case LFIGCAPTION_T:
+      return "LFIGCAPTION_T";
+    case LTABLE_T:
+      return "LTABLE_T";
+    case LCAPTION_T:
+      return "LCAPTION_T";
+    case LTH_T:
+      return "LTH_T";
+    case LTR_T:
+      return "LTR_T";
+    case LTD_T:
+      return "LTD_T";
+
+
     case LINEBR_T:
       return "LINEBR_T";
     case TEXT_T:
