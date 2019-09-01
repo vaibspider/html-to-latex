@@ -532,7 +532,7 @@ alphanumspecial ({alpha}|{digit}|{special})
   return CTELETYPE;
 }
 
-<INITIAL>{alphanumspecial}({whitespace}*{alphanumspecial})* {
+<INITIAL>{whitespace}*{alphanumspecial}({whitespace}*{alphanumspecial})*{whitespace}* {
   if (debug == 1) ECHO;
   yylval.str = strdup(yytext);
   /*printf("TEXT::%s::TEXT\n", yytext);*/
