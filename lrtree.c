@@ -222,6 +222,10 @@ char *get_tag_type(tag type) {
       return "TR_T";
     case TD_T:
       return "TD_T";
+    case SYMBOL_T:
+      return "SYMBOL_T";
+    case AMPERSAND_T:
+      return "AMPERSAND_T";
     default:
       return "EMPTY";
   }

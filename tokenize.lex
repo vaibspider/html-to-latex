@@ -57,11 +57,13 @@ alpha [a-zA-Z]
 alphas {alpha}+
 digit [0-9]
 digits {digit}+
-special [-\[\]"{}!@#$%\^&*()+=_';:,./?~`\\|]
+special [-\[\]"{}!@#$%\^*()+=_';:,./?~`\\|]
 hyperlink ({alpha}|{digit}|[-%&+=@#/_:.])+
 
 alphanumdot ({alpha}|{digit}|[.])
 alphanumspecial ({alpha}|{digit}|{special})
+Symbol (Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|Lambda|Mu|Nu|Xi|Omicron|Pi|Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega|Rho)
+symbol (alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|sigma|tau|upsilon|phi|chi|psi|omega|rho|{n}{b}{s}{p})
 
 %%
 
@@ -75,6 +77,15 @@ alphanumspecial ({alpha}|{digit}|{special})
   [^-\n]+ {/*printf("comment::%s::comment\n", yytext);*/}
   [-]+ {/*printf("comment::%s::comment\n", yytext);*/}
   \n  ;
+}
+
+"&" {
+  return AMPERSAND;
+}
+
+{whitespace}*"&"({Symbol}|{symbol})";"{whitespace}* {
+  yylval.str = strdup(yytext);
+  return SYMBOL;
 }
 
 "<!"{d}{o}{c}{t}{y}{p}{e}{whitespaces}{h}{t}{m}{l} {

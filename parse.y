@@ -18,6 +18,7 @@
 
 /*%glr-parser*/
 
+%token SYMBOL AMPERSAND
 %token OHTML CHTML
 %token OHEAD CHEAD
 %token OTITLE CTITLE
@@ -49,6 +50,7 @@
   struct linked_list *l;
 }
 
+%type <str> SYMBOL AMPERSAND
 %type <l> flow_content_rec phrasing_content_rec
 %type <l> flow_wo_table_rec flow_wo_heading_rec flow_wo_anchor_rec
 %type <n> flow_wo_table 
@@ -233,6 +235,13 @@ phrasing_content_wo_anchor:
   text | bold | emphasis | italic | image | small | strong | sub | sup | underline | center | font | teletype |
   LINEBR {
     $$ = create_node(LINEBR_T);
+  } |
+  SYMBOL {
+    $$ = create_node(SYMBOL_T);
+    $$->data = $1;
+  } |
+  AMPERSAND {
+    $$ = create_node(AMPERSAND_T);
   }
 
 text:

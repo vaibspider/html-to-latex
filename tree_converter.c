@@ -25,6 +25,12 @@ int tablecols = 0;
 tag map_l_type(tag type) {
   //printf("getting type for %s\n", get_tag_type(type));
   switch(type) {
+    case SYMBOL_T:
+      return SYMBOL_T;
+      break;
+    case AMPERSAND_T:
+      return AMPERSAND_T;
+      break;
     case LINEBR_T:
       return NEWLINE_T;
       break;
@@ -169,6 +175,208 @@ node *convert_node(node *htm_node, tag type) {
   return ltx_node;
 }
 
+char *get_symbol_mapping(char *symbol) {
+  if (strcmp(symbol, "&nbsp;") == 0) {
+    return "\ ";
+  }
+  if (strcmp(symbol, "&alpha;") == 0) {
+    return "$\\alpha$";
+  }
+  if (strcmp(symbol, "&beta;") == 0) {
+    return "$\\beta$";
+  }
+  if (strcmp(symbol, "&gamma;") == 0) {
+    return "$\\gamma$";
+  }
+  if (strcmp(symbol, "&delta;") == 0) {
+    return "$\\delta$";
+  }
+  if (strcmp(symbol, "&epsilon;") == 0) {
+    return "$\\epsilon$";
+  }
+  if (strcmp(symbol, "&zeta;") == 0) {
+    return "$\\zeta$";
+  }
+  if (strcmp(symbol, "&eta;") == 0) {
+    return "$\\eta$";
+  }
+  if (strcmp(symbol, "&theta;") == 0) {
+    return "$\\theta$";
+  }
+  if (strcmp(symbol, "&iota;") == 0) {
+    return "$\\iota$";
+  }
+  if (strcmp(symbol, "&kappa;") == 0) {
+    return "$\\kappa$";
+  }
+  if (strcmp(symbol, "&lambda;") == 0) {
+    return "$\\lambda$";
+  }
+  if (strcmp(symbol, "&mu;") == 0) {
+    return "$\\mu$";
+  }
+  if (strcmp(symbol, "&nu;") == 0) {
+    return "$\\nu$";
+  }
+  if (strcmp(symbol, "&xi;") == 0) {
+    return "$\\xi$";
+  }
+  if (strcmp(symbol, "&omicron;") == 0) {
+    return "$o$";
+  }
+  if (strcmp(symbol, "&pi;") == 0) {
+    return "$\\pi$";
+  }
+  if (strcmp(symbol, "&rho;") == 0) {
+    return "$\\rho$";
+  }
+  if (strcmp(symbol, "&sigma;") == 0) {
+    return "$\\sigma$";
+  }
+  if (strcmp(symbol, "&tau;") == 0) {
+    return "$\\tau$";
+  }
+  if (strcmp(symbol, "&upsilon;") == 0) {
+    return "$\\upsilon$";
+  }
+  if (strcmp(symbol, "&phi;") == 0) {
+    return "$\\phi$";
+  }
+  if (strcmp(symbol, "&chi;") == 0) {
+    return "$\\chi$";
+  }
+  if (strcmp(symbol, "&psi;") == 0) {
+    return "$\\psi$";
+  }
+  if (strcmp(symbol, "&omega;") == 0) {
+    return "$\\omega$";
+  }
+
+
+  if (strcmp(symbol, "&Alpha;") == 0) {
+    return "$A$";
+  }
+  if (strcmp(symbol, "&Beta;") == 0) {
+    return "$B$";
+  }
+  if (strcmp(symbol, "&Gamma;") == 0) {
+    return "$\\Gamma$";
+  }
+  if (strcmp(symbol, "&Delta;") == 0) {
+    return "$\\Delta$";
+  }
+  if (strcmp(symbol, "&Epsilon;") == 0) {
+    return "$E$";
+  }
+  if (strcmp(symbol, "&Zeta;") == 0) {
+    return "$Z$";
+  }
+  if (strcmp(symbol, "&Eta;") == 0) {
+    return "$H$";
+  }
+  if (strcmp(symbol, "&Theta;") == 0) {
+    return "$\\Theta$";
+  }
+  if (strcmp(symbol, "&Iota;") == 0) {
+    return "$I$";
+  }
+  if (strcmp(symbol, "&Kappa;") == 0) {
+    return "$K$";
+  }
+  if (strcmp(symbol, "&Lambda;") == 0) {
+    return "$\\Lambda$";
+  }
+  if (strcmp(symbol, "&Mu;") == 0) {
+    return "$M$";
+  }
+  if (strcmp(symbol, "&Nu;") == 0) {
+    return "$N$";
+  }
+  if (strcmp(symbol, "&Xi;") == 0) {
+    return "$\\Xi$";
+  }
+  if (strcmp(symbol, "&Omicron;") == 0) {
+    return "$O$";
+  }
+  if (strcmp(symbol, "&Pi;") == 0) {
+    return "$\\Pi$";
+  }
+  if (strcmp(symbol, "&Rho;") == 0) {
+    return "$P$";
+  }
+  if (strcmp(symbol, "&Sigma;") == 0) {
+    return "$\\Sigma$";
+  }
+  if (strcmp(symbol, "&Tau;") == 0) {
+    return "$T$";
+  }
+  if (strcmp(symbol, "&Upsilon;") == 0) {
+    return "$\\Upsilon$";
+  }
+  if (strcmp(symbol, "&Phi;") == 0) {
+    return "$\\Phi$";
+  }
+  if (strcmp(symbol, "&Chi;") == 0) {
+    return "$X$";
+  }
+  if (strcmp(symbol, "&Psi;") == 0) {
+    return "$\\Psi$";
+  }
+  if (strcmp(symbol, "&Omega;") == 0) {
+    return "$\\Omega$";
+  }
+  return "$SYMBOL$";
+}
+
+char *convert_symbol(char *input) {
+  char *start_wh = strdup(input);
+  char *s = start_wh;
+  char *end_wh = strdup(input);
+  char *t = end_wh;
+  int skip_start = 0;
+  int skip_end = 0;
+  while(*input == ' ' || *input == '\n' || *input == '\t') {
+    *s = *input;
+    s++;
+    input++;
+  }
+  if (*s == *start_wh)
+    skip_start = 1;
+  *s = '\0';
+
+  char *symbol = strdup(input);
+  char *c = symbol;
+  while(! (*input == ' ' || *input == '\n' || *input == '\t' || *input == '\0')) {
+    *c = *input;
+    c++;
+    input++;
+  }
+  if (*c == '\0')
+    skip_end = 1;
+  *c = '\0';
+  char *mapping = get_symbol_mapping(symbol);
+
+  while(*input == ' ' || *input == '\n' || *input == '\t') {
+    *t = *input;
+    t++;
+    input++;
+  }
+  if (*t == *end_wh)
+    skip_end = 1;
+  *t = '\0';
+  char *res = (char *)malloc(strlen(start_wh) + strlen(end_wh) + strlen(mapping) + 1);
+  strcpy(res, "");
+  if (skip_start == 0)
+    strcpy(res, start_wh);
+  strcat(res, mapping);
+  if (skip_end == 0)
+    strcat(res, end_wh);
+  //free(start_wh);
+  //free(end_wh);
+  //free(mapping);
+  return res;
+}
+
 node *ltraverse(node *n) {
   node *temp;
   if (n == NULL) {
@@ -177,6 +385,9 @@ node *ltraverse(node *n) {
   //Assuming that n->type is present
   tag ltype = map_l_type(n->type);
   //printf("got ltype: %s\n", get_tag_type(ltype));
+  if (ltype == SYMBOL_T) {
+    strcpy(n->data, convert_symbol(n->data));
+  }
   if (ltype == LIMAGE_T) {
     imageseen = 1;
   }
@@ -242,6 +453,12 @@ void to_file(tree *latex, char *file) {
 
 void process_before_lchild(node *n) {
   switch(n->type) {
+    case SYMBOL_T:
+      fprintf(fp, "%s", n->data);
+      break;
+    case AMPERSAND_T:
+      fprintf(fp, "&");
+      break;
     case NEWLINE_T:
       fprintf(fp, "\\\\");
       break;
@@ -451,6 +668,9 @@ void process_before_lchild(node *n) {
 
 void process_after_lchild(node *n) {
   switch(n->type) {
+    case SYMBOL_T:
+    case AMPERSAND_T:
+      break;
     case NEWLINE_T:
     case CONTENT_T:
     case DOC_CLASS_T:
