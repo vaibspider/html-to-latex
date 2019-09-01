@@ -656,5 +656,6 @@ int main(int argc, char **argv) {
     printf("================================================LATEX TREE=====================================================\n");
     latex_tree = convert(html_tree);
     print_tree(latex_tree);
+    to_file(latex_tree, "output.tex");
     return 0;
 }
