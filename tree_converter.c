@@ -23,13 +23,15 @@ int titleseen = 0;
 int tablecols = 0;
 
 tag map_l_type(tag type) {
-  //printf("getting type for %s\n", get_tag_type(type));
   switch(type) {
     case SYMBOL_T:
       return SYMBOL_T;
       break;
     case AMPERSAND_T:
       return AMPERSAND_T;
+      break;
+    case BACKSLASH_AMPERSAND_T:
+      return BACKSLASH_AMPERSAND_T;
       break;
     case LINEBR_T:
       return NEWLINE_T;
@@ -157,27 +159,34 @@ tag map_l_type(tag type) {
 node *convert_node(node *htm_node, tag type) {
   node *ltx_node;
   ltx_node = create_node(type);
-  /*if (type == HREF_T)
-    printf("HREF_T in convert_node\n");*/
   if (htm_node->data) {
-    /*if (type == HREF_T)
-      printf("HREF_T in convert_node\n");*/
-    ltx_node->data = strdup(htm_node->data);/* to be implemented ; processing and converting data */
+    ltx_node->data = strdup(htm_node->data);
   }
   if (htm_node->attributes) {
-    /*if (type == HREF_T)
-      printf("HREF_T in convert_node\n");*/
-    ltx_node->attributes = strdup(htm_node->attributes);/* to be implemented; processing and converting attributes */
+    ltx_node->attributes = strdup(htm_node->attributes);
   }
-  /*if (type == HREF_T)
-    printf("HREF_T in convert_node\n");*/
   ltx_node->lchild = ltx_node->rsibling = NULL;
   return ltx_node;
 }
 
 char *get_symbol_mapping(char *symbol) {
+  if (strcmp(symbol, "&quot;") == 0) {
+    return "\"";
+  }
+  if (strcmp(symbol, "&amp;") == 0) {
+    return "\\&";
+  }
+  if (strcmp(symbol, "&lt;") == 0) {
+    return "\\textless";
+  }
+  if (strcmp(symbol, "&gt;") == 0) {
+    return "\\textgreater";
+  }
+  if (strcmp(symbol, "&frasl;") == 0) {
+    return "\\slash";
+  }
   if (strcmp(symbol, "&nbsp;") == 0) {
-    return "\ ";
+    return "\\ ";
   }
   if (strcmp(symbol, "&alpha;") == 0) {
     return "$\\alpha$";
@@ -371,9 +380,136 @@ char *convert_symbol(char *input) {
   strcat(res, mapping);
   if (skip_end == 0)
     strcat(res, end_wh);
-  //free(start_wh);
-  //free(end_wh);
-  //free(mapping);
+  return res;
+}
+
+char *process_content(char *text) {
+  char *res = (char *)malloc((2 * strlen(text)) * sizeof(char));
+  strcpy(res, text);
+  char *s = text;
+  char *t = res;
+  while(*s != '\0') {
+    switch(*s) {
+      case '{':
+        *t = '\\';
+        t++;
+        *t = *s;
+        t++;
+        s++;
+        break;
+      case '}':
+        *t = '\\';
+        t++;
+        *t = *s;
+        t++;
+        s++;
+        break;
+      case '_':
+        *t = '\\';
+        t++;
+        *t = *s;
+        t++;
+        s++;
+        break;
+      case '$':
+        *t = '\\';
+        t++;
+        *t = *s;
+        t++;
+        s++;
+        break;
+      case '%':
+        *t = '\\';
+        t++;
+        *t = *s;
+        t++;
+        s++;
+        break;
+      case '#':
+        *t = '\\';
+        t++;
+        *t = *s;
+        t++;
+        s++;
+        break;
+      case '@':
+        *t = *s;
+        t++;
+        s++;
+        break;
+      case '^':
+        *t = '\\';
+        t++;
+        *t = 't';
+        t++;
+        *t = 'e';
+        t++;
+        *t = 'x';
+        t++;
+        *t = 't';
+        t++;
+        *t = 'a';
+        t++;
+        *t = 's';
+        t++;
+        *t = 'c';
+        t++;
+        *t = 'i';
+        t++;
+        *t = 'i';
+        t++;
+        *t = 'c';
+        t++;
+        *t = 'i';
+        t++;
+        *t = 'r';
+        t++;
+        *t = 'c';
+        t++;
+        *t = 'u';
+        t++;
+        *t = 'm';
+        t++;
+        s++;
+        break;
+      case '~':
+        *t = '\\';
+        t++;
+        *t = 't';
+        t++;
+        *t = 'e';
+        t++;
+        *t = 'x';
+        t++;
+        *t = 't';
+        t++;
+        *t = 'a';
+        t++;
+        *t = 's';
+        t++;
+        *t = 'c';
+        t++;
+        *t = 'i';
+        t++;
+        *t = 'i';
+        t++;
+        *t = 't';
+        t++;
+        *t = 'i';
+        t++;
+        *t = 'l';
+        t++;
+        *t = 'd';
+        t++;
+        *t = 'e';
+        t++;
+        s++;
+        break;
+      default:
+        break;
+    }
+  }
+  *t = '\0';
   return res;
 }
 
@@ -382,11 +518,17 @@ node *ltraverse(node *n) {
   if (n == NULL) {
     return NULL;
   }
-  //Assuming that n->type is present
   tag ltype = map_l_type(n->type);
-  //printf("got ltype: %s\n", get_tag_type(ltype));
+  if (ltype == AMPERSAND_T) {
+    n->data = "\\&";
+  }
+  if (ltype == BACKSLASH_AMPERSAND_T) {
+    ;//leave it as it is
+  }
   if (ltype == SYMBOL_T) {
-    strcpy(n->data, convert_symbol(n->data));
+    char *tmp = (convert_symbol(n->data));
+    n->data = strdup(tmp);
+    free(tmp);//free
   }
   if (ltype == LIMAGE_T) {
     imageseen = 1;
@@ -407,15 +549,12 @@ node *ltraverse(node *n) {
   else {
     temp = convert_node(n, ltype);
     if (n->lchild && n->type != DOCTYPE_T) {
-      //printf("going left::%s\n", get_tag_type(n->type));
       temp->lchild = ltraverse(n->lchild);
     }
     if (n->rsibling) {
-      //printf("going right::%s\n", get_tag_type(n->type));
       temp->rsibling = ltraverse(n->rsibling);
     }
   }
-  //printf("returning from::%s\n", get_tag_type(n->type));
   return temp;
 }
 
@@ -432,13 +571,11 @@ tree *convert(tree *src) {
     return src;
   }
   troot = ltraverse(sroot);
-  //printf("returned\n");
   target->root = troot;
   return target;
 }
 
 void to_file(tree *latex, char *file) {
-  //char *s = (char *)malloc(SIZE * sizeof(char));
   fp = fopen(file, "w");
   if (fp == NULL) {
     perror("Unable to open file \n");
@@ -457,7 +594,10 @@ void process_before_lchild(node *n) {
       fprintf(fp, "%s", n->data);
       break;
     case AMPERSAND_T:
-      fprintf(fp, "&");
+      fprintf(fp, "%s", n->data);
+      break;
+    case BACKSLASH_AMPERSAND_T:
+      fprintf(fp, "%s", n->data);
       break;
     case NEWLINE_T:
       fprintf(fp, "\\\\");
@@ -505,7 +645,6 @@ void process_before_lchild(node *n) {
       }
       break;
     case CENTERING_T:
-      printf("==========printing \\begin{center}========\n");
       fprintf(fp, "\n\\begin{center}\n");
       break;
     case PARA_T:
@@ -532,13 +671,13 @@ void process_before_lchild(node *n) {
     case LITEM_T:
       fprintf(fp, "\n\\item ");
       break;
-    case DESCLIST_T:
+    case LDESCLIST_T:
       fprintf(fp, "\n\\begin{description}");
       break;
-    case DESCTERM_T:
+    case LDESCTERM_T:
       fprintf(fp, "\n\\item[");
       break;
-    case DESCDESC_T:
+    case LDESCDESC_T:
       break;
     case LDIV_T:
       break;
@@ -568,10 +707,8 @@ void process_before_lchild(node *n) {
       break;
     case LIMAGE_T:
       if (n->attributes) {
-        printf("=========================================image attributes: %s================================\n", n->attributes);
         char *s = n->attributes;
         char *next = get_next_attribute(s);
-        printf("=============================================next attribute = %s=====================\n", next);
         char *src;
         int width = -1, height = -1;
         while(next != NULL) {
@@ -579,46 +716,36 @@ void process_before_lchild(node *n) {
             case 's':
               //next += 4;
               src = next + 4;
-              printf("============================src = %s=====================\n", src);
               break;
             case 'w':
               //next += 6;
               width = atoi(next + 6);
-              printf("========================width = %d=================\n", width);
               break;
             case 'h':
               //next += 7;
               height = atoi(next + 7);
-              printf("========================height = %d=================\n", width);
               break;
             default:
-              printf("====================================================default===================================\n");
               break;
           }
           s += strlen(next);
-          printf("=====================================s +++ = %s============================\n", s);
           next = get_next_attribute(s);
-          printf("=============================================next attribute = %s=====================\n", next);
         }
         if (width != -1 && height != -1) {
-          printf("==================================width and height===============================\n");
           fprintf(fp, "\\includegraphics[width=%dmm, height=%dmm]{%s}", width, height, src);
         }
         else if(width != -1) {
-          printf("==================================width===============================\n");
           fprintf(fp, "\\includegraphics[width=%dmm]{%s}", width, src);
         }
         else if(height != -1) {
-          printf("==================================height===============================\n");
           fprintf(fp, "\\includegraphics[height=%dmm]{%s}", height, src);
         }
         else {
-          printf("==================================Plain Image with just src ===============================\n");
           fprintf(fp, "\\includegraphics{%s}", src);
         }
       }
       else {
-        printf("No attributes found in image!\n");
+        ;
       }
       break;
     case LFIGURE_T:
@@ -670,6 +797,7 @@ void process_after_lchild(node *n) {
   switch(n->type) {
     case SYMBOL_T:
     case AMPERSAND_T:
+    case BACKSLASH_AMPERSAND_T:
       break;
     case NEWLINE_T:
     case CONTENT_T:
@@ -703,13 +831,13 @@ void process_after_lchild(node *n) {
       break;
     case LITEM_T:
       break;
-    case DESCLIST_T:
+    case LDESCLIST_T:
       fprintf(fp, "\n\\end{description}");
       break;
-    case DESCTERM_T:
+    case LDESCTERM_T:
       fprintf(fp, "]");
       break;
-    case DESCDESC_T:
+    case LDESCDESC_T:
       break;
     case LDIV_T:
       break;

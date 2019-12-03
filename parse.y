@@ -3,7 +3,6 @@
   #include <string.h>
   #include "node.h"
   #include "linked_list.h"
-  #include "stack.h"
   #include "lrtree.h"
   #include "tree_converter.h"
   int yylex(void);
@@ -14,11 +13,9 @@
   tree *latex_tree;
 %}
 
-/*%define lr.type canonical-lr*/
 
-/*%glr-parser*/
 
-%token SYMBOL AMPERSAND
+%token SYMBOL AMPERSAND BACKSLASH_AMPERSAND
 %token OHTML CHTML
 %token OHEAD CHEAD
 %token OTITLE CTITLE
@@ -43,14 +40,12 @@
 
 
 %union {
-  long int4;
-  float fp;
   char *str;
   struct node *n;
   struct linked_list *l;
 }
 
-%type <str> SYMBOL AMPERSAND
+%type <str> SYMBOL AMPERSAND BACKSLASH_AMPERSAND
 %type <l> flow_content_rec phrasing_content_rec
 %type <l> flow_wo_table_rec flow_wo_heading_rec flow_wo_anchor_rec
 %type <n> flow_wo_table 
@@ -242,6 +237,11 @@ phrasing_content_wo_anchor:
   } |
   AMPERSAND {
     $$ = create_node(AMPERSAND_T);
+    $$->data = $1;
+  } |
+  BACKSLASH_AMPERSAND {
+    $$ = create_node(AMPERSAND_T);
+    $$->data = $1;
   }
 
 text:
@@ -660,11 +660,9 @@ int main(int argc, char **argv) {
     html_tree = init_tree();
     latex_tree = init_tree();
     yyparse();
-    printf("================================================HTML TREE=====================================================\n");
-    print_tree(html_tree);
-    printf("================================================LATEX TREE=====================================================\n");
+    //print_tree(html_tree);
     latex_tree = convert(html_tree);
-    print_tree(latex_tree);
-    to_file(latex_tree, "output.tex");
+    //print_tree(latex_tree);
+    to_file(latex_tree, argv[1]);
     return 0;
 }

@@ -86,32 +86,3 @@ void print_list(list *l) {
   }
   printf("\n");
 }
-
-/*
-int main() {
-  list *l = init_list();
-  node *n = create_node(HTML_T);
-  list_append(l, n);
-  print_list(l);
-  list_delete(l);
-  n = create_node(HEAD_T);
-  list_append(l, n);
-  print_list(l);
-  n = list_search(l, HEAD_T);
-  printf("HEAD_T found: %d\n", n->type);
-  n = create_node(BODY_T);
-  list_append(l, n);
-  n = create_node(TITLE_T);
-  list_append(l, n);
-  n = create_node(ANCHOR_T);
-  list_append(l, n);
-  print_list(l);
-  n = list_search(l, BODY_T);
-  printf("BODY_T found: %d\n", n->type);
-  list_delete(l);
-  print_list(l);
-  n = list_search(l, TITLE_T);
-  printf("TITLE_T found: %d\n", n->type);
-  return 0;
-}
-*/

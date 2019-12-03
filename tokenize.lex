@@ -63,24 +63,29 @@ hyperlink ({alpha}|{digit}|[-%&+=@#/_:.])+
 alphanumdot ({alpha}|{digit}|[.])
 alphanumspecial ({alpha}|{digit}|{special})
 Symbol (Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|Lambda|Mu|Nu|Xi|Omicron|Pi|Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega|Rho)
-symbol (alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|sigma|tau|upsilon|phi|chi|psi|omega|rho|{n}{b}{s}{p})
+symbol (alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|sigma|tau|upsilon|phi|chi|psi|omega|rho|{n}{b}{s}{p}|{q}{u}{o}{t}|{a}{m}{p}|{l}{t}|{g}{t}|{f}{r}{a}{s}{l})
 
 %%
 
 <INITIAL>{
-  "<!--" {BEGIN in_comment;
-  /*printf("comment started.......\n");*/}
+  "<!--" {BEGIN in_comment;}
 }
 
 <in_comment>{
-  "-->" {BEGIN INITIAL; /*printf("comment ended........\n");*/ }
-  [^-\n]+ {/*printf("comment::%s::comment\n", yytext);*/}
-  [-]+ {/*printf("comment::%s::comment\n", yytext);*/}
+  "-->" {BEGIN INITIAL; }
+  [^-\n]+ {;}
+  [-]+ {;}
   \n  ;
 }
 
 "&" {
+  yylval.str = strdup(yytext);
   return AMPERSAND;
+}
+
+"\\&" {
+  yylval.str = strdup(yytext);
+  return BACKSLASH_AMPERSAND;
 }
 
 {whitespace}*"&"({Symbol}|{symbol})";"{whitespace}* {
@@ -139,7 +144,7 @@ symbol (alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi
   return JUSTOANCHOR;
 }
 
-"<"{a}{whitespace}*{h}{r}{e}{f}{whitespace}*={whitespace}*["'] {
+"<"{a}{whitespace}+{h}{r}{e}{f}{whitespace}*={whitespace}*["'] {
   if (debug == 1) ECHO;
   BEGIN beforehyperlink;
   return BEFOREHYPERLINK;
@@ -546,7 +551,6 @@ symbol (alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi
 <INITIAL>{whitespace}*{alphanumspecial}({whitespace}*{alphanumspecial})*{whitespace}* {
   if (debug == 1) ECHO;
   yylval.str = strdup(yytext);
-  /*printf("TEXT::%s::TEXT\n", yytext);*/
   return TEXT;
 }
 
@@ -568,9 +572,3 @@ void yyerror(const char *s) {
 int yywrap(void) {
   return 1;
 }
-
-/*int main() {
-  while(1)
-    yylex();
-	return 0;
-}*/

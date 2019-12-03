@@ -1,6 +1,5 @@
 #include "lrtree.h"
 #include "linked_list.h"
-#include "stack.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -233,7 +232,6 @@ char *get_tag_type(tag type) {
 
 void print(node *n) {
   if (n && n->type) {
-    //printf(":::%d:::", n->type);
     printf(":::%s:::", get_tag_type(n->type));
     if (n->data) {
       printf(":::%s:::\n", n->data);
@@ -266,15 +264,3 @@ node *find_node(tree *t, tag type) {
   node *r = t->root;
   return traverse(r, type);
 }
-
-/*
-int main(int argc, char **argv) {
-  tree *t = init_tree();
-  node *new = new_node("webpage", NON_TERMINAL);
-  add_root(t, new);
-  node *new = new_node("<html>", TERMINAL);
-  add_node(t, new, 
-  node *new = new_node("<html>", TERMINAL);
-  return 0;
-}
-*/

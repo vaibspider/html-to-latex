@@ -10,7 +10,7 @@ typedef struct linked_list {
 list *init_list();
 node *list_search(list *, tag);
 list *list_append(list *, node *);
-node *list_delete(list *); /* delete from end */
+node *list_delete(list *); /* delete from right end */
 void print_list(list *);
 
 #endif
